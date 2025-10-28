@@ -2,8 +2,11 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs.js';
 
+/* eslint-disable no-unused-vars */
 let stompClient = null;
 let onMessageCallback = null;
+let currentRoomId;
+/* eslint-enable no-unused-vars */
 
 export function connectWebSocket(roomId, onMessage) {
   if (stompClient && stompClient.connected) {

@@ -339,8 +339,8 @@ export default function Dashboard() {
           <div className="dash-loading">Cargando…</div>
         ) : error ? (
           <div className="ns-alert ns-alert--err">{error}</div>
-         ) : (
-           selectedRoom ? (
+          ) : (
+            selectedRoom ? (
              <section className="dash-room-view">
                 <aside className="dash-right">
                 <h2 className="dash-section-title">
@@ -571,9 +571,9 @@ export default function Dashboard() {
                   </div>
                   <ChatBox />
                  </aside>
-                </section>
-            }
-       </main>
+                 </section>
+        }
+        </main>
 
 
 

@@ -31,23 +31,7 @@ const handleSend = (e) => {
 
 return (
 
-<div style={{
-
-background: 'rgba(0,0,0,0.35)',
-
-borderRadius: '12px',
-
-padding: '12px',
-
-height: '520px',
-
-display: 'flex',
-
-flexDirection: 'column',
-
-border: '1px solid rgba(255,255,255,0.06)',
-
-}}>
+<div className="room-chat">
 
 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
 
@@ -65,21 +49,7 @@ border: '1px solid rgba(255,255,255,0.06)',
 
 ref={listRef}
 
-style={{
-
-flex: 1,
-
-overflowY: 'auto',
-
-paddingRight: 8,
-
-display: 'flex',
-
-gap: 8,
-
-flexDirection: 'column'
-
-}}
+className="rc-messages"
 
 >
 

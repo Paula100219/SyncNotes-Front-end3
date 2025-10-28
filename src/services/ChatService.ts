@@ -43,25 +43,33 @@ return t;
 
 }
 
-public connect({
+  public connect({
 
-roomId,
+    roomId,
 
-onMessage,
+    onMessage,
 
-onStatus
+    onStatus
 
-}: {
+  }: {
 
-roomId: string;
+    roomId: string;
 
-onMessage: MsgCb;
+    onMessage: MsgCb;
 
-onStatus?: StatusCb;
+    onStatus?: StatusCb;
 
-}): void {
+  }): void {
 
-if (this.connected && this.roomId === roomId) return; // evita duplicados
+    if (this.sub && this.roomId === roomId) {
+
+      console.warn("[WS] Ya suscrito a esta sala, ignorando.");
+
+      return;
+
+    }
+
+    if (this.connected && this.roomId === roomId) return; // evita duplicados
 
 const token = ChatService.jwt();
 

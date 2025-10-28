@@ -39,7 +39,9 @@ class RoomWS {
             if (body?.type === 'CHAT_MESSAGE') {
               this.onMessage(body.payload);
             }
-          } catch {}
+          } catch {
+            // ignore
+          }
         });
       },
       onStompError: () => {
@@ -70,7 +72,9 @@ class RoomWS {
     try {
       if (this.sub) this.sub.unsubscribe();
       if (this.client?.active) this.client.deactivate();
-    } catch {}
+    } catch {
+      // ignore
+    }
     this.sub = null;
     this.client = null;
     this.connected = false;
