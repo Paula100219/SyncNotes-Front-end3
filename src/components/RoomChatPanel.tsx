@@ -3,6 +3,8 @@ import { chatService } from "../services/ChatService";
 import { useAuth } from '@/hooks/useAuth';
 import "./room-chat.css";
 
+
+
 const initialsOf = (name: string = '') =>
  name.trim().split(/\s+/).slice(0,2).map(s => s[0]?.toUpperCase() || '').join('');
 
@@ -30,6 +32,12 @@ const currentUsername = () =>
 const msgKey = (m: any) => {
   const bucket = Math.round(new Date(m.createdAt ?? 0).getTime() / 3000);
   return [norm(m.username), norm(m.content), bucket].join('|');
+};
+
+const currentIdentity = (auth: any) => {
+  const id = [auth?.user?.id, auth?.user?.userId, (auth as any)?.userId].map(v => (v ?? '').toString().trim()).find(v => v !== '');
+  const username = [auth?.user?.username, auth?.user?.userName, auth?.user?.name, (auth as any)?.username].map(v => (v ?? '').toString().trim().toLowerCase()).find(v => v !== '');
+  return { id, username };
 };
 
 export default function RoomChatPanel({ roomId }: { roomId: string }) {
@@ -70,6 +78,9 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
             const key = msgKey(m);
             if (seenRef.current.has(key)) return;
             seenRef.current.add(key);
+            const fromMeBySignature = recentSentRef.current.has(makeSig(roomId, m.content));
+            (m as any)._fromMe = fromMeBySignature;
+
             setMessages((prev) => [...(prev ?? []), m]);
           },
     });
@@ -93,6 +104,16 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
     const text = input.trim();
     if (!text || !connected) return;
     chatService.sendMessage(text);
+    const { id: myId, username: myUser } = currentIdentity(auth);
+    const myMessage = {
+      id: `temp-${Date.now()}`,
+      userId: myId,
+      username: myUser,
+      content: text,
+      createdAt: new Date().toISOString(),
+      _fromMe: true,
+    };
+    setMessages(prev => [...(prev ?? []), myMessage]);
     setInput("");
   };
 
@@ -111,11 +132,13 @@ No hay mensajes todavía. ¡Rompe el hielo y saluda al equipo!
 </div>
 )}
   {messages?.map((m: any) => {
-    const myId = [auth?.user?.id, auth?.user?.userId, (auth as any)?.userId].map(v => (v ?? '').toString().trim()).find(v => v !== '');
-    const myUser = [auth?.user?.username, auth?.user?.userName, auth?.user?.name, (auth as any)?.username].map(v => (v ?? '').toString().trim().toLowerCase()).find(v => v !== '');
+    const { id: myId, username: myUser } = currentIdentity(auth);
     const msgId = (m.userId ?? '').toString().trim();
     const msgUser = (m.username ?? '').toString().trim().toLowerCase();
-    const isMe = (myId && msgId && myId === msgId) || (myUser && msgUser && myUser === msgUser);
+    const isMe =
+      (m as any)._fromMe === true ||
+      (!!myId && myId === msgId) ||
+      (!!myUser && myUser === msgUser);
     return (
     <div key={String(m.id ?? m.createdAt ?? `${m.username}-${Math.random()}`)} className={`rc-item ${isMe ? 'me' : ''}`}>
     {!isMe && <div className="rc-avatar">{(m.username ?? '?').slice(0,2).toUpperCase()}</div>}
