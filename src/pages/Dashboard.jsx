@@ -464,11 +464,12 @@ export default function Dashboard() {
                               title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
                               style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
                             >
-                              {t.completed ? (
+                              {(
+                                t.completed ?
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
                                 </svg>
-                              ) : (
+                               :
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
                                 </svg>
@@ -520,7 +521,7 @@ export default function Dashboard() {
                   </button>
               </aside>
               </section>
-              ) : 
+                               ) :
                <section className="dash-grid">
                {/* 🟦 Salas */}
                <div className="dash-left">
@@ -571,9 +572,9 @@ export default function Dashboard() {
                   </div>
                   <ChatBox />
                  </aside>
-                 </section>
-        }
-        </main>
+                  </section>
+         }
+         </main>
 
 
 

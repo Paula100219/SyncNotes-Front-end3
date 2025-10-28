@@ -34,6 +34,8 @@ const msgKey = (m: any) => {
   return [norm(m.username), norm(m.content), bucket].join('|');
 };
 
+
+
 const currentIdentity = (auth: any) => {
   const id = [auth?.user?.id, auth?.user?.userId, (auth as any)?.userId].map(v => (v ?? '').toString().trim()).find(v => v !== '');
   const username = [auth?.user?.username, auth?.user?.userName, auth?.user?.name, (auth as any)?.username].map(v => (v ?? '').toString().trim().toLowerCase()).find(v => v !== '');
@@ -48,6 +50,8 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
   const mounted = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const seenRef = useRef<Set<string>>(new Set());
+  const recentRef = useRef<Map<string, number>>(new Map());
+  const seenIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     mounted.current = true;
@@ -74,12 +78,18 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
               content,
               createdAt,
             };
-            // 3) DEDUPE (deja tu lógica; si ya tienes seenRef/msgKey, úsala aquí)
-            const key = msgKey(m);
-            if (seenRef.current.has(key)) return;
-            seenRef.current.add(key);
-            const fromMeBySignature = recentSentRef.current.has(makeSig(roomId, m.content));
-            (m as any)._fromMe = fromMeBySignature;
+            // 3) DEDUPE
+            // Solo por ID si existe
+            const idKey = (m.id ? `id:${String(m.id)}` : null);
+            if (idKey) {
+              if (seenIdsRef.current.has(idKey)) return;
+              seenIdsRef.current.add(idKey);
+            }
+            // Marcar como mío si el username coincide
+            const { id: myId, username: myUser } = currentIdentity(auth);
+            if (sameUser(myUser, m.username)) {
+              (m as any)._fromMe = true;
+            }
 
             setMessages((prev) => [...(prev ?? []), m]);
           },
@@ -104,16 +114,6 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
     const text = input.trim();
     if (!text || !connected) return;
     chatService.sendMessage(text);
-    const { id: myId, username: myUser } = currentIdentity(auth);
-    const myMessage = {
-      id: `temp-${Date.now()}`,
-      userId: myId,
-      username: myUser,
-      content: text,
-      createdAt: new Date().toISOString(),
-      _fromMe: true,
-    };
-    setMessages(prev => [...(prev ?? []), myMessage]);
     setInput("");
   };
 
