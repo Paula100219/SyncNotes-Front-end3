@@ -15,5 +15,7 @@ export function useAuth() {
     }
   }, [token]);
 
-  return { token, user };
+  const meName = user?.username ?? user?.userName ?? user?.name ?? 'Yo';
+
+  return { token, user, meName };
 }

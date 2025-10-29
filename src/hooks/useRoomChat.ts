@@ -17,14 +17,20 @@ export function useRoomChat(roomId: string, httpBaseUrl: string) {
   const { user, token } = useAuth();
   const [status, setStatus] = useState<ChatStatus>("Desconectado");
   const [messages, setMessages] = useState<UiMessage[]>([]);
-  const ids = useRef<Set<string>>(new Set());
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const recentRef = useRef<Map<string, number>>(new Map());
   const myId = user?.id || "";
 
   const onMessage = useCallback(
     (payload: any) => {
       const mid = String(payload.id ?? `${payload.userId}-${payload.timestamp}-${payload.content}`);
-      if (ids.current.has(mid)) return;
-      ids.current.add(mid);
+      if (seenIdsRef.current.has(mid)) return;
+      const now = Date.now();
+      const key = `${payload.userId}-${payload.content}`;
+      const lastTime = recentRef.current.get(key);
+      if (lastTime && now - lastTime < 5000) return; // evita duplicados por ventana de llegada (5 segundos)
+      recentRef.current.set(key, now);
+      seenIdsRef.current.add(mid);
       setMessages((prev) => [
         ...prev,
         {
@@ -43,7 +49,8 @@ export function useRoomChat(roomId: string, httpBaseUrl: string) {
   useEffect(() => {
     if (!roomId) return;
     setMessages([]);
-    ids.current.clear();
+    seenIdsRef.current.clear();
+    recentRef.current.clear();
     chatService.connect({
       httpBaseUrl: "http://localhost:8081",
       roomId,

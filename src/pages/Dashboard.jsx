@@ -348,159 +348,127 @@ export default function Dashboard() {
                     ? `Sala: ${selectedRoom.name}`
                     : "Selecciona una sala"}
                 </h2>
-
-                  {selectedRoom && (
-                    <div>
-                      <div className="room-info">
-                        <h3>Información de la Sala</h3>
-                        <div>
-                          <p><strong>Descripción:</strong> {selectedRoom.description || "Sin descripción"}</p>
-                          <p><strong>Pública:</strong> {selectedRoom.isPublic ? "Sí" : "No"}</p>
-                          {(() => {
-                            const ownerUsername = getResolvedOwner(selectedRoom.members, selectedRoom.ownerId);
-                            return ownerUsername && <p><strong>Propietario:</strong> {ownerUsername}</p>;
-                          })()}
-                          <p><strong>Miembros:</strong> {sanitizeMembers(selectedRoom.members).length}</p>
-                          {selectedRoom.members && selectedRoom.members.some(m => m.userId === me?.id && (m.role === "OWNER" || m.role === "ADMIN")) && (
-                           <button className="btn-secondary" onClick={() => setOpenAddMemberModal(true)}>
-                             + Añadir Miembro
-                           </button>
-                          )}
-                        </div>
-
-                      </div>
-                      <div className="members-list">
-                       <h3>Miembros ({sanitizeMembers(selectedRoom.members).length})</h3>
-                        <ul>
+                   {selectedRoom && (
+                     <div>
+                       <div className="room-info">
+                         <h3>Información de la Sala</h3>
+                         <div>
+                           <p><strong>Descripción:</strong> {selectedRoom.description || "Sin descripción"}</p>
+                           <p><strong>Pública:</strong> {selectedRoom.isPublic ? "Sí" : "No"}</p>
                            {(() => {
                              const ownerUsername = getResolvedOwner(selectedRoom.members, selectedRoom.ownerId);
-                             return sanitizeMembers(selectedRoom.members).map((m) => {
-                               const roleMap = {
-                                 OWNER: "Propietario",
-                                 EDITOR: "Miembro",
-                                 VIEWER: "Lector",
-                               };
-                               const badgeClass = {
-                                 OWNER: "badge-owner",
-                                 EDITOR: "badge-editor",
-                                 VIEWER: "badge-viewer",
-                               };
-                               const isOwner = m.username === ownerUsername;
-                               const effectiveRole = isOwner ? "OWNER" : m.role;
-                               const label = typeof m === "string" ? m : (m.name || m.username || "Sin asignar");
-                               return (
-                                 <li key={typeof m === "string" ? m : m.userId}>
-                                   <div>
-                                     <strong>{label}</strong> <span className={`badge ${badgeClass[effectiveRole] || ""}`}>{roleMap[effectiveRole] || effectiveRole}</span>
-                                   </div>
-                                  {selectedRoom.members?.find(mem => mem.userId === me?.id)?.role === "OWNER" && m.role !== "OWNER" && (
-                                    <select
-                                      value={m.role}
-                                      onChange={(e) => handleChangeRole(m.userId, e.target.value)}
-                                    >
-                                      <option value="EDITOR">Miembro</option>
-                                      <option value="VIEWER">Lector</option>
-                                    </select>
-                                  )}
-                                </li>
-                              );
-                            });
+                             return ownerUsername && <p><strong>Propietario:</strong> {ownerUsername}</p>;
                            })()}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
+                           <p><strong>Miembros:</strong> {sanitizeMembers(selectedRoom.members).length}</p>
+                           {selectedRoom.members && selectedRoom.members.some(m => m.userId === me?.id && (m.role === "OWNER" || m.role === "ADMIN")) && (
+                            <button className="btn-secondary" onClick={() => setOpenAddMemberModal(true)}>
+                              + Añadir Miembro
+                            </button>
+                           )}
+                         </div>
+
+                       </div>
+                       <div className="members-list">
+                        <h3>Miembros ({sanitizeMembers(selectedRoom.members).length})</h3>
+                         <ul>
+                           {sanitizeMembers(selectedRoom.members).map((m, i) => {
+                             const effectiveRole = m.role || "EDITOR";
+                             const badgeClass = {
+                               OWNER: "badge-owner",
+                               ADMIN: "badge-admin",
+                               EDITOR: "badge-editor",
+                               VIEWER: "badge-viewer",
+                             };
+                             const roleMap = {
+                               OWNER: "PROPIETARIO",
+                               ADMIN: "ADMIN",
+                               EDITOR: "MIEMBRO",
+                               VIEWER: "LECTOR",
+                             };
+                             const label = m.name || m.username || `Usuario ${i + 1}`;
+                             return (
+                               <li key={m.userId || m.id || i} className="member-item">
+                                 <div className="member-info">
+                                   <span className="member-name">{label}</span>
+                                   <select
+                                     value={effectiveRole}
+                                     onChange={(e) => handleRoleChange(m.userId || m.id, e.target.value)}
+                                     disabled={!(me?.id === selectedRoom.ownerId || me?.role === "ADMIN")}
+                                     className="member-role-select"
+                                   >
+                                     <option value="EDITOR">Miembro</option>
+                                     <option value="VIEWER">Lector</option>
+                                   </select>
+                                 </div>
+                                 <div className="member-actions">
+                                   <button
+                                     className="btn-ghost"
+                                     onClick={() => handleRemoveMember(m.userId || m.id)}
+                                     disabled={!(me?.id === selectedRoom.ownerId || me?.role === "ADMIN")}
+                                   >
+                                     🗑️
+                                   </button>
+                                 </div>
+                               </li>
+                             );
+                           })}
+                         </ul>
+                       </div>
+                     </div>
+                   )}
 
                 <h3>Tareas</h3>
-
                 <div className="tasks-panel">
-                  {!selectedRoom && (
-                    <div className="tasks-empty">
-                      Selecciona una sala para ver sus tareas
-                    </div>
-                  )}
-
-            {tasks.length === 0 && (
                     <div className="tasks-empty">No hay tareas en esta sala 🧹</div>
-            )}
-
-            {tasks.length > 0 && (
                     <ul className="tasks-list">
                       {tasks.map((t) => (
-                       <li key={t.id} className="task-item">
-                         <div
-                           className="task-dot"
-                           style={{
-                             background:
-                               t.priority === "HIGH"
-                                 ? "#ef4444"
-                                 : t.priority === "LOW"
-                                 ? "#22c55e"
-                                 : "#f59e0b",
-                           }}
-                         />
-                          <div className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</div>
-
-                          <div className="task-meta" style={{ fontSize: "0.8em", color: "#666", marginTop: "4px" }}>
-                            Asignada a: {t.assignedToName || "Nadie"} | Creada por: {t.createdByName || "Usuario eliminado"}
+                        <li
+                          key={t.id}
+                          className="task-item"
+                          onClick={() => { setSelectedTask(t); setShowTaskModal(true); }}
+                        >
+                          {/* Lado izquierdo: punto + título */}
+                          <div className="task-main">
+                            <span className="dot" style={{ background: t.priority === "HIGH" ? "#ef4444" : t.priority === "LOW" ? "#22c55e" : "#f59e0b" }} />
+                            <span className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</span>
+                            <span className={`badge ${t.priority === "HIGH" ? "badge-danger" : t.priority === "LOW" ? "badge-success" : "badge-warning"}`}>
+                              {t.priority}
+                            </span>
                           </div>
-
-                          <span
-                            className={`badge ${
-                              t.priority === "HIGH"
-                                ? "badge-danger"
-                                : t.priority === "LOW"
-                                ? "badge-success"
-                                : "badge-warning"
-                            }`}
-                          >
-                            {t.priority}
-                          </span>
- 
-                          <div className="task-actions">
-                            <button
-                              className="btn-ghost small"
-                              onClick={() => handleToggleComplete(t)}
-                              title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
-                              style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
-                            >
-                              {(
-                                t.completed ?
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
-                                </svg>
-                               :
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
-                                </svg>
-                              )}
-                            </button>
-                          <button
-                            className="btn-ghost small"
-                            onClick={() => confirmDeleteTask(t)}
-                            style={{ color: '#ef4444' }}
-                          >
-                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
-                              </svg>
-                          </button>
-                          </div>
-                       </li>
-                     ))}
-                   </ul>
-                 )}
-                 {selectedRoom && (
-                       <button
-                         className="btn-panel"
-                         onClick={() => {
-                           setTaskForm({ title: "", description: "" });
-                           setOpenTaskModal(true);
-                         }}
-                       >
-                         + Nueva tarea
-                       </button>
-                  )}
+                          {/* Lado derecho: acciones (no deben propagar el click) */}
+                          <div className="task-actions" onClick={(e) => e.stopPropagation()}>
+                           <button
+                             className="icon-btn"
+                             title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
+                             onClick={() => handleToggleComplete(t)}
+                             style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
+                           >
+                             {t.completed ? (
+                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                 <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
+                               </svg>
+                             ) : (
+                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                 <path d="M9 16.17L4.83 12l-1.41-1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                               </svg>
+                             )}
+                           </button>
+                           <button
+                             className="icon-btn"
+                             title="Eliminar tarea"
+                              onClick={() => confirmDeleteTask(t)}
+                              style={{ color: '#ef4444' }}
+                           >
+                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                               <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
+                             </svg>
+                           </button>
+                        </div>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
+
                   <button
                     className="btn-panel"
                     onClick={() => setShowChat(!showChat)}
@@ -508,7 +476,6 @@ export default function Dashboard() {
                   >
                     {showChat ? 'Ocultar Chat' : 'Mostrar Chat'}
                   </button>
-                  {showChat && <ChatBox roomId={selectedRoom?.id} />}
                   <button
                     className="btn-panel"
                     onClick={() => {
@@ -557,9 +524,10 @@ export default function Dashboard() {
                               🗑️ Eliminar
                             </button>
                           </div>
-                        </div>
-                      )
-                    )}
+                          </div>
+                        ))}
+                  </div>
+                </div>
                </div>
 
                 {/* 🟩 Panel vacío en grid */}
@@ -567,14 +535,13 @@ export default function Dashboard() {
                   <h2 className="dash-section-title">
                     Selecciona una sala
                   </h2>
-                  <div className="tasks-empty">
+                   <div className="tasks-empty">
                     Haz clic en "Abrir sala" para ver detalles
                   </div>
-                  <ChatBox />
                  </aside>
-                  </section>
-         }
-         </main>
+               </section>
+           )
+        </main>
 
 
 

@@ -8,20 +8,73 @@ export default function ChatBox({ roomId }) {
   const [connected, setConnected] = useState(false);
   const clientRef = useRef(null);
   const listRef = useRef(null);
+  const recentSentRef = useRef(new Set());
+
+  const makeSig = (roomId, content) => `${roomId}|${content.trim()}`;
 
   useEffect(() => {
     if (!roomId) return;
+    console.log("roomId recibido en ChatBox:", roomId);
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      console.error(" No se encontró el token de autenticación");
+      return;
+    }
+
+    async function fetchMessages() {
+      try {
+        const response = await fetch(`http://localhost:8081/api/rooms/${roomId}/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Historial cargado:", data);
+          //  Mantener estructura: enviados a la derecha, recibidos a la izquierda
+          const userData = JSON.parse(atob(token.split(".")[1])); // decodifica el token
+          const currentUsername = userData.username; // el backend guarda el username en el token
+          setMessages(
+            data.map((msg) => ({
+              ...msg,
+              isOwnMessage: msg.username === currentUsername, // diferencia visual
+            }))
+          );
+        } else {
+          console.error(" Error al cargar mensajes:", response.status);
+        }
+      } catch (error) {
+        console.error(" Error al obtener mensajes:", error);
+      }
+    }
+
+    fetchMessages();
+
     (async () => {
       clientRef.current = await createChatClient({
         roomId,
         onConnected: () => setConnected(true),
         onMessage: (payload) => {
-          const msg = {
-            sender: payload?.sender || 'Equipo',
-            content: payload?.data?.content ?? payload?.content ?? '',
-            ts: payload?.timestamp || Date.now(),
-          };
-          setMessages((prev) => [...prev, msg]);
+          const content = payload?.data?.content ?? payload?.content ?? '';
+          const sig = makeSig(roomId, content);
+          if (recentSentRef.current.has(sig)) {
+            recentSentRef.current.delete(sig);
+            setMessages((prev) => prev.map(m => m.content === content && m.self && m.status === 'sending' ? {...m, status: 'sent'} : m));
+          } else {
+            const token = localStorage.getItem("auth_token");
+            let currentUsername = "";
+            if (token) {
+              const decoded = JSON.parse(atob(token.split(".")[1]));
+              currentUsername = decoded.username;
+            }
+            const sender = payload?.sender || "Equipo";
+            const msg = {
+              sender,
+              content,
+              ts: payload?.timestamp || Date.now(),
+              self: sender === currentUsername,
+              isOwnMessage: sender === currentUsername,
+            };
+            setMessages((prev) => [...prev, msg]);
+          }
         },
         onError: () => setConnected(false),
       });
@@ -38,11 +91,32 @@ export default function ChatBox({ roomId }) {
     e.preventDefault();
     const msg = text.trim();
     if (!msg) return;
-    clientRef.current?.sendChat(msg);
+    try {
+      clientRef.current?.client?.publish({
+        destination: `/app/room/${roomId}/chat`,
+        body: JSON.stringify({ content: msg }),
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` }
+      });
+      console.log("Mensaje enviado al backend:", msg);
+    } catch (err) {
+      console.error(" Error al publicar mensaje al backend:", err);
+    }
+    // Asegurar que los mensajes se guarden en la base de datos
+    fetch(`http://localhost:8081/api/rooms/${roomId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+      },
+      body: JSON.stringify({ content: msg })
+    }).catch(err => console.error('Error guardando mensaje:', err));
+    const ts = Date.now();
     setMessages((prev) => [
       ...prev,
-      { sender: getCurrentName() || 'Tú', content: msg, ts: Date.now(), self: true },
+      { sender: getCurrentName() || 'Tú', content: msg, ts, self: true, status: 'sending', isOwnMessage: true },
     ]);
+    recentSentRef.current.add(makeSig(roomId, msg));
+    setTimeout(() => recentSentRef.current.delete(makeSig(roomId, msg)), 5000);
     setText('');
   };
 
@@ -129,38 +203,39 @@ export default function ChatBox({ roomId }) {
             </div>
           </div>
         ) : (
-          messages.map((m, i) => {
-            const mine = m.self || (m.sender && m.sender === getCurrentName());
-            return (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  justifyContent: mine ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <div
-                  style={{
-                    maxWidth: '78%',
-                    background: mine ? '#2563EB' : '#374151',
-                    color: '#E5E7EB',
-                    borderRadius: 14,
-                    padding: '10px 12px',
-                    boxShadow: '0 2px 10px rgba(0,0,0,.25)',
-                  }}
-                >
-                  {!mine && (
-                    <div style={{ fontSize: 12, color: '#D1D5DB', marginBottom: 4 }}>
-                      {m.sender || 'Equipo'}
-                    </div>
-                  )}
-                  <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {m.content}
-                  </div>
-                </div>
-              </div>
-            );
-          })
+           messages.map((m, i) => (
+             <div
+               key={i}
+               className={`flex ${m.isOwnMessage ? "justify-end" : "justify-start"}`}
+             >
+               <div
+                 className={`p-2 rounded-lg max-w-xs ${
+                   m.isOwnMessage
+                     ? "bg-blue-500 text-white"
+                     : "bg-gray-200 text-gray-800"
+                 }`}
+               >
+                 {!m.isOwnMessage && (
+                   <div className="text-xs text-gray-500 mb-1">
+                     {m.sender || 'Equipo'}
+                   </div>
+                 )}
+                 <div className="whitespace-pre-wrap break-words">
+                   {m.content}
+                 </div>
+                 {m.isOwnMessage && m.status === 'sending' && (
+                   <div className="text-xs opacity-70 text-right mt-1">
+                     ⏳ Enviando...
+                   </div>
+                 )}
+                 {m.isOwnMessage && m.status === 'sent' && (
+                   <div className="text-xs opacity-70 text-right mt-1">
+                     ✓ Enviado
+                   </div>
+                 )}
+               </div>
+             </div>
+           ))
         )}
       </div>
 

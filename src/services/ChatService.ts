@@ -7,7 +7,7 @@ type StatusCb = (s: Status) => void;
 
 type MsgCb = (msg: any) => void;
 
-class ChatService {
+export class ChatService {
 
 private client: Client | null = null;
 
@@ -25,169 +25,137 @@ return String(base).replace(/\/+$/, "");
 
 }
 
-private static jwt(): string {
+static get(): ChatService {
 
-let t =
-
-localStorage.getItem("token") ||
-
-sessionStorage.getItem("token") ||
-
-"";
-
-// normaliza: sin comillas y sin "Bearer "
-
-t = t.replace(/^"|"$/g, "").replace(/^Bearer\s+/i, "");
-
-return t;
+return chatService;
 
 }
 
-  public connect({
+  public async connect(roomId: string, token: string, onMessage: MsgCb): Promise<() => void> {
 
-    roomId,
+    return new Promise((resolve, reject) => {
 
-    onMessage,
+      if (this.sub && this.roomId === roomId) {
 
-    onStatus
+        console.warn("[WS] Ya suscrito a esta sala, ignorando.");
 
-  }: {
+        resolve(() => {});
 
-    roomId: string;
+        return;
 
-    onMessage: MsgCb;
+      }
 
-    onStatus?: StatusCb;
+      if (this.connected && this.roomId === roomId) {
 
-  }): void {
+        resolve(() => {});
 
-    if (this.sub && this.roomId === roomId) {
+        return;
 
-      console.warn("[WS] Ya suscrito a esta sala, ignorando.");
+      }
 
-      return;
+      this.roomId = roomId;
 
-    }
+      if (this.client) {
 
-    if (this.connected && this.roomId === roomId) return; // evita duplicados
+        try { this.client.deactivate(); } catch {}
 
-const token = ChatService.jwt();
+        this.client = null;
 
-if (!token) {
+      }
 
-console.error("[WS] Falta JWT en storage.");
+      const webSocketFactory = () => new SockJS(`${ChatService.baseUrl()}/ws`);
 
-onStatus?.("Desconectado");
+      this.client = new Client({
 
-return;
+        webSocketFactory,
 
-}
+        connectHeaders: { Authorization: `Bearer ${token}` },
 
-this.roomId = roomId;
+        debug: () => {},
 
-// Desactiva cliente previo si lo hubiera
+        reconnectDelay: 5000,
 
-if (this.client) {
+        heartbeatOutgoing: 4000,
 
-try { this.client.deactivate(); } catch {}
+        heartbeatIncoming: 4000,
 
-this.client = null;
+        onConnect: () => {
 
-}
+          this.connected = true;
 
-const webSocketFactory = () => new SockJS(`${ChatService.baseUrl()}/ws`);
+          if (this.sub) {
 
-this.client = new Client({
+            try { this.sub.unsubscribe(); } catch {}
 
-webSocketFactory,
+            this.sub = null;
 
-connectHeaders: { Authorization: `Bearer ${token}` },
+          }
 
-debug: () => {},          // silencia logs
+          this.sub = this.client!.subscribe(`/topic/room/${roomId}`, (msg: IMessage) => {
 
-reconnectDelay: 5000,     // auto-reconexión
+            try {
 
-heartbeatOutgoing: 4000,
+              const data = JSON.parse(msg.body);
 
-heartbeatIncoming: 4000,
+              onMessage(data);
 
-onConnect: () => {
+            } catch (e) {
 
-this.connected = true;
+              console.error("[WS] Mensaje no JSON:", msg.body);
 
-onStatus?.("Conectado");
+            }
 
-// Limpia sub anterior
+          });
 
-if (this.sub) {
+          resolve(() => {
 
-try { this.sub.unsubscribe(); } catch {}
+            this.disconnect();
 
-this.sub = null;
+          });
 
-}
+        },
 
-// Suscribirse a los eventos de la sala
+        onStompError: (frame) => {
 
-this.sub = this.client!.subscribe(`/topic/room/${roomId}`, (msg: IMessage) => {
+          console.error("[WS] STOMP error:", frame.headers["message"], frame.body);
 
-try {
+          this.connected = false;
 
-const data = JSON.parse(msg.body);
+          reject(new Error("STOMP error"));
 
-onMessage?.(data);
+        },
 
-} catch (e) {
+        onWebSocketClose: () => {
 
-console.error("[WS] Mensaje no JSON:", msg.body);
+          this.connected = false;
 
-}
+          reject(new Error("WebSocket closed"));
 
-}
+        }
 
-);
+      });
 
-},
+      this.client.activate();
 
-onStompError: (frame) => {
+    });
 
-console.error("[WS] STOMP error:", frame.headers["message"], frame.body);
+  }
 
-this.connected = false;
+  public send(roomId: string, content: string): void {
 
-onStatus?.("Desconectado");
+    if (!this.connected || !this.client) return;
 
-},
+    const body = JSON.stringify({ content });
 
-onWebSocketClose: () => {
+    this.client.publish({
 
-this.connected = false;
+      destination: `/app/room/${roomId}/chat`,
 
-onStatus?.("Desconectado");
+      body
 
-}
+    });
 
-});
-
-this.client.activate();
-
-}
-
-public sendMessage(content: string): void {
-
-if (!this.connected || !this.client || !this.roomId) return;
-
-const body = JSON.stringify({ content });
-
-this.client.publish({
-
-destination: `/app/room/${this.roomId}/chat`,
-
-body
-
-});
-
-}
+  }
 
 public disconnect(): void {
 
@@ -216,3 +184,5 @@ this.roomId = null;
 }
 
 export const chatService = new ChatService();
+
+export default chatService;
