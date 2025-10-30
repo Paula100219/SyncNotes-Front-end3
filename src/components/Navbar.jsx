@@ -435,7 +435,7 @@ export default function Navbar({
                     <DropItem className="dropdown-item" onClick={openUpdateUser}>
                        Actualizar usuario
                      </DropItem>
-                     <DropItem className="dropdown-item" onClick={handleDeleteUser}>Eliminar usuario</DropItem>
+                      <DropItem className="dropdown-item" onClick={() => setShowDeleteConfirmModal(true)}>Eliminar usuario</DropItem>
                     <DropItem className="dropdown-item" onClick={handleLogout}>Cerrar sesión</DropItem>
                 </Dropdown>
               )}

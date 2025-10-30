@@ -487,46 +487,46 @@ export default function Dashboard() {
                     ← Volver a Mis Salas
                   </button>
               </aside>
-              </section>
-                               ) :
-               <section className="dash-grid">
+               </section>
+                                ) : (
+                <section className="dash-grid">
                {/* 🟦 Salas */}
                <div className="dash-left">
                  <h2 className="dash-section-title">Mis Salas</h2>
-                 <div className="rooms-grid">
-                    {rooms.length === 0 && (
-                     <div className="room-empty">
-                       <div className="room-empty-icon">👥</div>
-                       <div className="room-empty-title">Aún no tienes salas.</div>
-                       <div className="room-empty-sub">
-                         ¡Crea una para empezar a colaborar!
-                       </div>
-                     </div>
-          )}
-
-                     {rooms.length > 0 && rooms.map((r) => (
-                        <div key={r.id} className="room-card">
-                          <div className="room-title">{r.name}</div>
-                          <div className="room-sub">
-                            {r.members?.length ?? 0} miembros
-                          </div>
-                          <div className="room-actions">
-                            <button
-                              className="btn-secondary"
-                              onClick={() => handleOpenRoom(r)}
-                            >
-                              Abrir sala
-                            </button>
-                            <button
-                              className="btn-ghost"
-                              onClick={() => confirmDeleteRoom(r)}
-                            >
-                              🗑️ Eliminar
-                            </button>
-                          </div>
-                          </div>
-                        ))}
-                  </div>
+                  <div className="rooms-grid">
+                     {rooms.length === 0 ? (
+                      <div className="room-empty">
+                        <div className="room-empty-icon">👥</div>
+                        <div className="room-empty-title">Aún no tienes salas.</div>
+                        <div className="room-empty-sub">
+                          ¡Crea una para empezar a colaborar!
+                        </div>
+                      </div>
+                     ) : (
+                       rooms.map((r) => (
+                         <div key={r.id} className="room-card">
+                           <div className="room-title">{r.name}</div>
+                           <div className="room-sub">
+                             {r.members?.length ?? 0} miembros
+                           </div>
+                           <div className="room-actions">
+                             <button
+                               className="btn-secondary"
+                               onClick={() => handleOpenRoom(r)}
+                             >
+                               Abrir sala
+                             </button>
+                             <button
+                               className="btn-ghost"
+                               onClick={() => confirmDeleteRoom(r)}
+                             >
+                               🗑️ Eliminar
+                             </button>
+                           </div>
+                         </div>
+                       ))
+                     )}
+                   </div>
                 </div>
                </div>
 
@@ -538,9 +538,9 @@ export default function Dashboard() {
                    <div className="tasks-empty">
                     Haz clic en "Abrir sala" para ver detalles
                   </div>
-                 </aside>
-               </section>
-           )
+                  </aside>
+                </section>
+                )
         </main>
 
 
