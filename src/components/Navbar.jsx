@@ -248,13 +248,14 @@ const Modal = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: #111827;
+  background: #0d1117;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border-radius: 18px;
   padding: 20px;
   max-width: 400px;
   width: 90%;
   box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  transition: all 0.3s ease-in-out;
 `;
 
 export default function Navbar({
@@ -273,7 +274,8 @@ export default function Navbar({
 
   // 🔹 Estados para actualizar usuario
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState(null);
   const [form, setForm] = useState({ name: "", username: "" });
@@ -429,14 +431,10 @@ export default function Navbar({
               >
                  <AvatarInitials>{initials}</AvatarInitials>
               </AvatarTrigger>
-              {menuOpen && (
+               {menuOpen && (
                 <Dropdown>
-                  <DropItem className="dropdown-item" onClick={() => navigate("/perfil")}>Perfil</DropItem>
-                    <DropItem className="dropdown-item" onClick={openUpdateUser}>
-                       Actualizar usuario
-                     </DropItem>
-                      <DropItem className="dropdown-item" onClick={() => setShowDeleteConfirmModal(true)}>Eliminar usuario</DropItem>
-                    <DropItem className="dropdown-item" onClick={handleLogout}>Cerrar sesión</DropItem>
+                  <DropItem className="dropdown-item" onClick={() => { setMenuOpen(false); setShowProfileModal(true); }}>Perfil</DropItem>
+                  <DropItem className="dropdown-item" onClick={handleLogout}>Cerrar sesión</DropItem>
                 </Dropdown>
               )}
            </div>
@@ -489,7 +487,7 @@ export default function Navbar({
                 onClick={async () => { setShowDeleteConfirmModal(false); await handleDeleteUser(); }}
                 disabled={loading}
                 style={{
-                  backgroundColor: '#dc3545',
+                  backgroundColor: '#dc2626',
                   color: 'white',
                   border: 'none',
                   padding: '0.5rem 1rem',
@@ -517,6 +515,34 @@ export default function Navbar({
         </Modal>
       )}
 
+      {showProfileModal && (
+        <Modal onClick={() => setShowProfileModal(false)}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <Avatar style={{ width: '80px', height: '80px', fontSize: '2rem', margin: '0 auto 1rem' }}>
+                {initials}
+              </Avatar>
+              <h3 style={{ color: '#e5e7eb', margin: '0 0 0.5rem 0' }}>
+                {localStorage.getItem("name") || "Usuario"}
+              </h3>
+              <p style={{ color: '#9ca3af', margin: 0 }}>
+                @{localStorage.getItem("username") || "username"}
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <Button onClick={() => { setShowProfileModal(false); openUpdateUser(); }}>
+                Actualizar usuario
+              </Button>
+              <Button color="#dc2626" onClick={() => { setShowProfileModal(false); setShowDeleteConfirmModal(true); }}>
+                Eliminar usuario
+              </Button>
+              <Button color="#6b7280" onClick={() => { setShowProfileModal(false); handleLogout(); }}>
+                Cerrar sesión
+              </Button>
+            </div>
+          </ModalContent>
+        </Modal>
+      )}
 
       </>
     );

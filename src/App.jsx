@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RoomsList from "./pages/RoomsList";
 import RoomDetail from "./pages/RoomDetail";
+import Perfil from "./pages/Perfil";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
@@ -30,6 +31,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <RoomDetail />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute>
+              <Perfil />
             </ProtectedRoute>
           }
         />
