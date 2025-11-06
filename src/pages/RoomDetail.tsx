@@ -106,6 +106,7 @@ export default function RoomDetail(): JSX.Element {
   const [room, setRoom] = useState<Room | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(true);
 
    // Estados del modal añadir miembro
     const [openAddMemberModal, setOpenAddMemberModal] = useState<boolean>(false);
@@ -364,158 +365,166 @@ useEffect(() => {
     <div className="ns-root">
       <Navbar variant="dashboard" />
 
-      <main className="dash-main">
-        <header className="dash-header">
-          <button className="btn-primary" onClick={() => navigate("/dashboard")}>
-            ← Volver a Mis Salas
-          </button>
-          <h1 className="dash-title">Sala: {room.name}</h1>
-        </header>
+       <main className="dash-main">
+         <header className="dash-header">
+           <button className="btn-primary" onClick={() => navigate("/dashboard")}>
+             ← Volver a Mis Salas
+           </button>
+           <h1 className="dash-title">Sala: {room.name}</h1>
+           <button className="btn-toggle-chat" onClick={() => setIsChatOpen(!isChatOpen)}>
+             {isChatOpen ? 'Ocultar Chat' : 'Mostrar Chat'}
+           </button>
+         </header>
 
-        <section className="dash-room-detail">
-            {/* Info sala */}
-            <div className="room-info">
-              <h3>Información de la Sala</h3>
-               <p><strong>Descripción:</strong> {room.description || "Sin descripción"}</p>
-               <p><strong>Pública:</strong> {room.isPublic ? "Sí" : "No"}</p>
-               {ownerUsername && (
-                 <p>
-                   <strong>Propietario:</strong>{" "}
-                   {(() => {
-                     const ownerObj = safeMembers.find(
-                       (m) => typeof m !== "string" && m?.username === ownerUsername
-                     );
-                     return ownerObj?.name || ownerObj?.username || ownerUsername;
-                   })()}
-                 </p>
-               )}
-               <p><strong>Miembros:</strong> {safeMembers.length}</p>
-              <button className="btn-primary" onClick={handleOpenAddMember} style={{ marginTop: '10px' }}>
-                + Añadir Miembro
-              </button>
-            </div>
+         <section className="dash-room-detail">
+             {/* Columna Izquierda: Sidebar */}
+             <div className="sidebar-column">
+               <div className="room-info">
+                 <h3 className="panel-title">Información de la Sala</h3>
+                  <p><strong>Descripción:</strong> {room.description || "Sin descripción"}</p>
+                  <p><strong>Pública:</strong> {room.isPublic ? "Sí" : "No"}</p>
+                  {ownerUsername && (
+                    <p>
+                      <strong>Propietario:</strong>{" "}
+                      {(() => {
+                        const ownerObj = safeMembers.find(
+                          (m) => typeof m !== "string" && m?.username === ownerUsername
+                        );
+                        return ownerObj?.name || ownerObj?.username || ownerUsername;
+                      })()}
+                    </p>
+                  )}
+                  <p><strong>Miembros:</strong> {safeMembers.length}</p>
+                 <button className="btn-primary" onClick={handleOpenAddMember} style={{ marginTop: '10px' }}>
+                   + Añadir Miembro
+                 </button>
+               </div>
 
-              {/* Miembros */}
-              <div className="members-list">
-                 <h3>Miembros ({safeMembers.length})</h3>
-                <ul className="members">
-                   {safeMembers.map((m, i) => {
-                     const key = typeof m === "string" ? m : (m.id || m.username || i);
-                     const username = typeof m === "string"
-                       ? m.split(":")[0] // por si viene "usuario:OWNER"
-                       : m.username;
-                     const label = typeof m === "string"
-                       ? username
-                       : (m.name || m.username);
-                     // Es propietario si coincide con ownerUsername o si su objeto trae flag de owner
-                     const isOwner =
-                       (ownerUsername && username === ownerUsername) ||
-                       (typeof m !== "string" &&
-                         (m.role === "OWNER" ||
-                          m.role === "PROPIETARIO" ||
-                          m.isOwner === true ||
-                          m?.roles?.includes?.("OWNER")));
-                     return (
-                       <li key={key} className="member-item">
-                         <span>{label}</span>
-                         {isOwner ? (
-                           <span className="badge badge-owner">PROPIETARIO</span>
-                         ) : (
-                           <span className="badge badge-member">MIEMBRO</span>
+               <div className="members-list">
+                  <h3 className="panel-title">Miembros ({safeMembers.length})</h3>
+                 <ul className="members">
+                    {safeMembers.map((m, i) => {
+                      const key = typeof m === "string" ? m : (m.id || m.username || i);
+                      const username = typeof m === "string"
+                        ? m.split(":")[0] // por si viene "usuario:OWNER"
+                        : m.username;
+                      const label = typeof m === "string"
+                        ? username
+                        : (m.name || m.username);
+                      // Es propietario si coincide con ownerUsername o si su objeto trae flag de owner
+                      const isOwner =
+                        (ownerUsername && username === ownerUsername) ||
+                        (typeof m !== "string" &&
+                          (m.role === "OWNER" ||
+                           m.role === "PROPIETARIO" ||
+                           m.isOwner === true ||
+                           m?.roles?.includes?.("OWNER")));
+                      return (
+                        <li key={key} className="member-item">
+                          <span>{label}</span>
+                          {isOwner ? (
+                            <span className="badge badge-owner">PROPIETARIO</span>
+                          ) : (
+                            <span className="badge badge-member">MIEMBRO</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                 </ul>
+                 <h4 className="panel-subtitle">Usuarios Activos</h4>
+                 {activeUsers.length === 0 ? (
+                   <p>No hay usuarios en esta sala.</p>
+                 ) : (
+                   <ul className="active-users-list">
+                     {activeUsers.map((user) => (
+                       <li key={user.id} className="active-user-item">
+                         <span className="active-user-icon">🟢</span>
+                         {user.name || user.username}
+                       </li>
+                     ))}
+                   </ul>
+                 )}
+               </div>
+             </div>
+
+             {/* Columna Central: Tareas */}
+             <div className="tasks-column">
+               <div className="tasks-panel">
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                   <h3 className="panel-title">Tareas</h3>
+                   {myRole !== 'VIEWER' && (
+                     <button className="btn-primary" onClick={handleOpenTaskModal}>
+                       + Nueva tarea
+                     </button>
+                   )}
+                 </div>
+                {tasks.length === 0 ? (
+                  <div className="tasks-empty">No hay tareas en esta sala</div>
+                ) : (
+                   <ul className="tasks-list">
+                     {tasks.map((t) => (
+                       <li
+                         key={t.id}
+                         className="task-item"
+                         onClick={() => { setTaskSelected(t); setShowTaskModal(true); }}
+                       >
+                         {/* Lado izquierdo: punto + título */}
+                         <div className="task-main">
+                           <span className="dot" style={{ background: t.priority === "HIGH" ? "#ef4444" : t.priority === "LOW" ? "#22c55e" : "#f59e0b" }} />
+                           <span className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</span>
+                           <span className={`badge ${t.priority === "HIGH" ? "badge-danger" : t.priority === "LOW" ? "badge-success" : "badge-warning"}`}>
+                             {t.priority}
+                           </span>
+                         </div>
+                         {/* Lado derecho: acciones (no deben propagar el click) */}
+                         {myRole !== 'VIEWER' && (
+                           <div className="task-actions" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                className="icon-btn"
+                                title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
+                                onClick={() => handleToggleComplete(t)}
+                                style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
+                              >
+                                {t.completed ? (
+                                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
+                                  </svg>
+                                ) : (
+                                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                                  </svg>
+                                )}
+                              </button>
+                              <button
+                                className="icon-btn"
+                                title="Eliminar tarea"
+                                 onClick={() => confirmDeleteTask(t)}
+                                 style={{ color: '#ef4444' }}
+                              >
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
+                                </svg>
+                              </button>
+                           </div>
                          )}
                        </li>
-                     );
-                   })}
-                </ul>
-              </div>
-
-            {/* Usuarios Activos */}
-            <div className="active-users-panel">
-              <h3>Usuarios Activos</h3>
-              {activeUsers.length === 0 ? (
-                <p>No hay usuarios en esta sala.</p>
-              ) : (
-                <ul className="active-users-list">
-                  {activeUsers.map((user) => (
-                    <li key={user.id} className="active-user-item">
-                      <span className="active-user-icon">🟢</span>
-                      {user.name || user.username}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* Tareas */}
-            <div className="tasks-panel">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3>Tareas</h3>
-                {myRole !== 'VIEWER' && (
-                  <button className="btn-primary" onClick={handleOpenTaskModal}>
-                    + Nueva tarea
-                  </button>
+                     ))}
+                  </ul>
                 )}
               </div>
-             {tasks.length === 0 ? (
-               <div className="tasks-empty">No hay tareas en esta sala</div>
-             ) : (
-                <ul className="tasks-list">
-                  {tasks.map((t) => (
-                    <li
-                      key={t.id}
-                      className="task-item"
-                      onClick={() => { setTaskSelected(t); setShowTaskModal(true); }}
-                    >
-                      {/* Lado izquierdo: punto + título */}
-                      <div className="task-main">
-                        <span className="dot" style={{ background: t.priority === "HIGH" ? "#ef4444" : t.priority === "LOW" ? "#22c55e" : "#f59e0b" }} />
-                        <span className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</span>
-                        <span className={`badge ${t.priority === "HIGH" ? "badge-danger" : t.priority === "LOW" ? "badge-success" : "badge-warning"}`}>
-                          {t.priority}
-                        </span>
-                      </div>
-                      {/* Lado derecho: acciones (no deben propagar el click) */}
-                      {myRole !== 'VIEWER' && (
-                        <div className="task-actions" onClick={(e) => e.stopPropagation()}>
-                           <button
-                             className="icon-btn"
-                             title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
-                             onClick={() => handleToggleComplete(t)}
-                             style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
-                           >
-                             {t.completed ? (
-                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                 <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
-                               </svg>
-                             ) : (
-                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
-                               </svg>
-                             )}
-                           </button>
-                           <button
-                             className="icon-btn"
-                             title="Eliminar tarea"
-                              onClick={() => confirmDeleteTask(t)}
-                              style={{ color: '#ef4444' }}
-                           >
-                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                               <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
-                             </svg>
-                           </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-               </ul>
-             )}
-           </div>
+             </div>
 
-               {/* Chat de la sala */}
-               <RoomChatPanel
-                 roomId={roomId}
-                 currentUsername={user?.username}
-               />
+             {/* Columna Derecha: Chat */}
+             <div className="chat-column">
+               {isChatOpen ? (
+                 <RoomChatPanel
+                   roomId={roomId}
+                   currentUsername={user?.username}
+                 />
+               ) : (
+                 <div className="chat-placeholder"></div>
+               )}
+             </div>
         </section>
       </main>
 

@@ -241,13 +241,11 @@ export default function ChatBox({ roomId, onClose }) {
                   <p className="text-xs opacity-70 text-right">{msg.username}</p>
                 </div>
               </div>
-            }))
+             }))
+
         }
 
-        )}
-
         </div>
-
             <form onSubmit={send} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
              <input
                value={text}
@@ -286,28 +284,7 @@ export default function ChatBox({ roomId, onClose }) {
            </div>
          </div>
              </div>
-           ) : (
-               messages.map((msg, index) => {
-                 const isOwnMessage = msg.isOwnMessage;
-                 return (
-                   <div
-                     key={index}
-                     className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-2`}
-                   >
-                     <div
-                       className={`max-w-xs px-3 py-2 rounded-2xl shadow-md ${
-                         isOwnMessage
-                           ? "bg-blue-600 text-white rounded-br-none"
-                           : "bg-gray-700 text-white rounded-bl-none"
-                       }`}
-                     >
-                       <p className="text-sm">{msg.content}</p>
-                       <p className="text-xs opacity-70 text-right">{msg.username}</p>
-                     </div>
-                   </div>
-                 );
-               })
-           )}
+
          </div>
 
          )}
