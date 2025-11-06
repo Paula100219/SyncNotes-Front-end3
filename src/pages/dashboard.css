@@ -44,29 +44,22 @@
 
 /* Botón toggle chat */
 .btn-toggle-chat {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 0.9rem;
+  border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 .btn-toggle-chat:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
-}
-
-.btn-toggle-chat:active {
-  transform: translateY(0);
+  background: rgba(16, 185, 129, 0.25);
 }
 
 .btn-toggle-chat::before {
@@ -563,17 +556,23 @@
 /* === ROOM DETAIL VIEW === */
 .dash-room-detail {
   display: grid;
-  grid-template-columns: 25% 40% 35%;
+  grid-template-columns: 30% 40% 30%;
   gap: 24px;
   width: 100%;
-  padding: 20px 30px 0;
+  padding: 16px 24px 0;
   box-sizing: border-box;
+}
+
+@media (min-width: 1280px) {
+  .dash-room-detail {
+    gap: 32px;
+  }
 }
 
 @media (max-width: 1024px) {
   .dash-room-detail {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 12px;
   }
   .sidebar-column, .tasks-column, .chat-column {
     height: auto;
@@ -598,7 +597,7 @@
   font-size: 1.125rem;
   font-weight: 600;
   text-align: left;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   color: #e6eaf2;
 }
 
