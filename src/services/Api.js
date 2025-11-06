@@ -349,6 +349,11 @@ export function getRoomHistory(roomId) {
   return apiGet(`/api/rooms/${encodeURIComponent(roomId)}/history`);
 }
 
+// ✅ Obtener usuarios activos en sala
+export function getActiveUsers(roomId) {
+  return apiGet(`/api/rooms/${encodeURIComponent(roomId)}/active-users`);
+}
+
 
 
 // ✅ Actualizar usuario (PUT) SOLO { name, username }

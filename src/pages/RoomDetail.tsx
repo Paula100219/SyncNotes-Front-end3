@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import RoomChatPanel from "../components/RoomChatPanel";
 import { useAuth } from "../hooks/useAuth";
-import { getRoomDetails, getRoomTasks, addMember, searchUser, updateTask, deleteTask, createTask } from "../services/api";
+import { getRoomDetails, getRoomTasks, addMember, searchUser, updateTask, deleteTask, createTask, getActiveUsers } from "../services/api";
 import "./dashboard.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -37,6 +37,12 @@ interface Task {
   createdByName?: string;
   createdByUsername?: string;
   createdAt?: string;
+}
+
+interface ActiveUser {
+  id: string;
+  username: string;
+  name?: string;
 }
 
 interface User {
@@ -118,28 +124,57 @@ export default function RoomDetail(): JSX.Element {
   });
   const [taskError, setTaskError] = useState<string>("");
   const [taskLoading, setTaskLoading] = useState<boolean>(false);
-     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-     const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
-     const [taskSelected, setTaskSelected] = useState<Task | null>(null);
+      const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+      const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
+      const [taskSelected, setTaskSelected] = useState<Task | null>(null);
+      const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
 
-    // Cargar datos
-     useEffect(() => {
-        (async () => {
-          try {
-            setLoading(true);
-            const [roomData, tasksData] = await Promise.all([
-              getRoomDetails(roomId!),
-              getRoomTasks(roomId!),
-            ]);
-            setRoom({ ...roomData, members: sanitizeMembers(roomData.members) });
-            setTasks(tasksData);
-         } catch (e) {
-           setError(e?.message || "No se pudo cargar la sala.");
-         } finally {
-           setLoading(false);
-         }
-       })();
-     }, [roomId]);
+    // 🔹 Efecto para cargar datos iniciales y mantener usuarios activos actualizados
+useEffect(() => {
+  // Espera a tener el token y el roomId antes de hacer llamadas al backend
+  if (!roomId || !token) return;
+
+  let intervalId;
+
+  const fetchRoomData = async () => {
+    try {
+      setLoading(true);
+      const [roomData, tasksData, activeUsersData] = await Promise.all([
+        getRoomDetails(roomId),
+        getRoomTasks(roomId),
+        getActiveUsers(roomId),
+      ]);
+
+      setRoom({ ...roomData, members: sanitizeMembers(roomData.members) });
+      setTasks(tasksData);
+      setActiveUsers(activeUsersData || []);
+    } catch (e) {
+      console.error("❌ Error cargando sala:", e);
+      setError(e?.message || "No se pudo cargar la sala.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshActiveUsers = async () => {
+    try {
+      const data = await getActiveUsers(roomId);
+      setActiveUsers(data || []);
+    } catch (e) {
+      console.warn("⚠️ No se pudo actualizar usuarios activos:", e.message);
+    }
+  };
+
+  // Carga inicial
+  fetchRoomData();
+
+  // Refresca usuarios activos cada 10 s
+  intervalId = setInterval(refreshActiveUsers, 10000);
+
+  // Limpieza al desmontar
+  return () => clearInterval(intervalId);
+}, [roomId, token]);
+
 
     // Cerrar modal con Esc
     useEffect(() => {
@@ -394,16 +429,33 @@ export default function RoomDetail(): JSX.Element {
                 </ul>
               </div>
 
-           {/* Tareas */}
-           <div className="tasks-panel">
-             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-               <h3>Tareas</h3>
-               {myRole !== 'VIEWER' && (
-                 <button className="btn-primary" onClick={handleOpenTaskModal}>
-                   + Nueva tarea
-                 </button>
-               )}
-             </div>
+            {/* Usuarios Activos */}
+            <div className="active-users-panel">
+              <h3>Usuarios Activos</h3>
+              {activeUsers.length === 0 ? (
+                <p>No hay usuarios en esta sala.</p>
+              ) : (
+                <ul className="active-users-list">
+                  {activeUsers.map((user) => (
+                    <li key={user.id} className="active-user-item">
+                      <span className="active-user-icon">🟢</span>
+                      {user.name || user.username}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Tareas */}
+            <div className="tasks-panel">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3>Tareas</h3>
+                {myRole !== 'VIEWER' && (
+                  <button className="btn-primary" onClick={handleOpenTaskModal}>
+                    + Nueva tarea
+                  </button>
+                )}
+              </div>
              {tasks.length === 0 ? (
                <div className="tasks-empty">No hay tareas en esta sala</div>
              ) : (
@@ -598,29 +650,48 @@ export default function RoomDetail(): JSX.Element {
         </div>
        )}
 
-       {/* Modal de Detalle */}
-       {showTaskModal && taskSelected && (
-         <div className="modal-backdrop" onClick={() => setShowTaskModal(false)}>
-           <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-             <div className="modal-header">
-               <h3 className="modal-title">{taskSelected.title}</h3>
-               <button className="btn-close" onClick={() => setShowTaskModal(false)}>×</button>
-             </div>
-             <div className="modal-body">
-               {taskSelected.description
-                 ? <p style={{whiteSpace: 'pre-wrap'}}>{taskSelected.description}</p>
-                 : <p style={{opacity:.7}}>Sin descripción.</p>}
-             </div>
-             {/* Opcional, pequeño pie informativo */}
-             {(taskSelected.createdByUsername || taskSelected.createdAt) && (
-               <div className="modal-footer meta">
-                   <span>Creada por: {taskSelected.createdByUsername || "Sin asignar"}</span>
-                 {taskSelected.createdAt && <span>  {new Date(taskSelected.createdAt).toLocaleString()}</span>}
-               </div>
-             )}
-           </div>
-         </div>
-       )}
+        {/* Modal de Detalle */}
+        {showTaskModal && taskSelected && (
+          <div className="modal-backdrop" onClick={() => setShowTaskModal(false)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3 className="modal-title">{taskSelected.title}</h3>
+                <button className="btn-close" onClick={() => setShowTaskModal(false)}>×</button>
+              </div>
+              <div className="modal-body">
+                {taskSelected.description
+                  ? <p style={{whiteSpace: 'pre-wrap'}}>{taskSelected.description}</p>
+                  : <p style={{opacity:.7}}>Sin descripción.</p>}
+              </div>
+              {/* Opcional, pequeño pie informativo */}
+              {(taskSelected.createdByUsername || taskSelected.createdAt) && (
+                <div className="modal-footer meta">
+                    <span>Creada por: {taskSelected.createdByUsername || "Sin asignar"}</span>
+                  {taskSelected.createdAt && <span>  {new Date(taskSelected.createdAt).toLocaleString()}</span>}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <style jsx>{`
+          .active-users-panel {
+            margin-bottom: 20px;
+          }
+          .active-users-list {
+            list-style: none;
+            padding: 0;
+          }
+          .active-user-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+          }
+          .active-user-icon {
+            font-size: 12px;
+          }
+        `}</style>
      </div>
    );
  }
