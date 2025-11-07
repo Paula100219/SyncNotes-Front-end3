@@ -56,7 +56,7 @@ function actionTag(action?: string) {
 }
 
 function resolveUserName(it: ChangeHistoryDto, userDirectory: Record<string, string>, currentUserId?: string) {
-  const fromDto = it.userName?.trim();
+  const fromDto = (it as any).user?.username || it.userName?.trim();
   if (fromDto) return fromDto;
   const id =
     (it as any).userId ||

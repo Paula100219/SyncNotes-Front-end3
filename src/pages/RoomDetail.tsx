@@ -364,12 +364,14 @@ useEffect(() => {
       } else {
         if (m.id) map[m.id] = m.name || m.username || 'Desconocido';
         if (m.username) map[m.username] = m.name || m.username;
+        if (m.userId) map[m.userId] = m.name || m.username || 'Desconocido';
       }
     });
     if (room?.owner) {
       const o = room.owner;
       if (o.id) map[o.id] = o.name || o.username || 'Desconocido';
       if (o.username) map[o.username] = o.name || o.username;
+      if (o.userId) map[o.userId] = o.name || o.username || 'Desconocido';
     }
     return map;
   })();
