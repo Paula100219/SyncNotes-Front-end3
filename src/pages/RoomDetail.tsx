@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import RoomChatPanel from "../components/RoomChatPanel";
+import HistoryPanel from "../components/HistoryPanel";
 import { useAuth } from "../hooks/useAuth";
 import { getRoomDetails, getRoomTasks, addMember, searchUser, updateTask, deleteTask, createTask, getActiveUsers } from "../services/api";
 import "./dashboard.css";
@@ -128,7 +129,8 @@ export default function RoomDetail(): JSX.Element {
       const [selectedTask, setSelectedTask] = useState<Task | null>(null);
       const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
       const [taskSelected, setTaskSelected] = useState<Task | null>(null);
-      const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+  const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
+  const [rightTab, setRightTab] = useState<'chat' | 'history'>('chat');
 
     // 🔹 Efecto para cargar datos iniciales y mantener usuarios activos actualizados
 useEffect(() => {
@@ -354,6 +356,24 @@ useEffect(() => {
   const myRole = room?.members?.find(m => m.userId === user?.id)?.role;
   const safeMembers = sanitizeMembers(room?.members || []);
 
+  const userDirectory = (() => {
+    const map: Record<string, string> = {};
+    safeMembers.forEach(m => {
+      if (typeof m === 'string') {
+        map[m] = m;
+      } else {
+        if (m.id) map[m.id] = m.name || m.username || 'Desconocido';
+        if (m.username) map[m.username] = m.name || m.username;
+      }
+    });
+    if (room?.owner) {
+      const o = room.owner;
+      if (o.id) map[o.id] = o.name || o.username || 'Desconocido';
+      if (o.username) map[o.username] = o.name || o.username;
+    }
+    return map;
+  })();
+
   let ownerUsername = getOwnerUsername(room);
   if (!ownerUsername) {
     ownerUsername = findOwnerUsernameFromMembers(safeMembers);
@@ -363,7 +383,7 @@ useEffect(() => {
 
   return (
     <div className="ns-root">
-      <Navbar variant="dashboard" />
+      <Navbar />
 
        <main className="dash-main">
          <header className="dash-header">
@@ -514,17 +534,36 @@ useEffect(() => {
               </div>
              </div>
 
-             {/* Columna Derecha: Chat */}
-             <div className="chat-column">
-               {isChatOpen ? (
-                 <RoomChatPanel
-                   roomId={roomId}
-                   currentUsername={user?.username}
-                 />
-               ) : (
-                 <div className="chat-placeholder"></div>
-               )}
-             </div>
+              {/* Columna Derecha: Chat/Historial */}
+              <div className="chat-column">
+                {isChatOpen ? (
+                  <>
+                    <div className="panel-header with-tabs">
+                      <div className="tabs-right">
+                        <button className={`tab-btn ${rightTab === "chat" ? "active" : ""}`} onClick={() => setRightTab("chat")}>Chat</button>
+                        <button className={`tab-btn ${rightTab === "history" ? "active" : ""}`} onClick={() => setRightTab("history")}>Historial</button>
+                      </div>
+                    </div>
+                    <div className="panel-content">
+                      {rightTab === 'chat' ? (
+                        <RoomChatPanel
+                          roomId={roomId}
+                          currentUsername={user?.username}
+                        />
+                      ) : (
+                        <HistoryPanel
+                          roomId={roomId!}
+                          authToken={token!}
+                          userDirectory={userDirectory}
+                          currentUserId={user?.id}
+                        />
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div className="chat-placeholder"></div>
+                )}
+              </div>
         </section>
       </main>
 
@@ -699,6 +738,23 @@ useEffect(() => {
           }
           .active-user-icon {
             font-size: 12px;
+          }
+          .tabs {
+            display: flex;
+            border-bottom: 1px solid #444;
+          }
+          .tab, .tab-active {
+            flex: 1;
+            padding: 10px;
+            background: #2a2a2a;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+          }
+          .tab-active {
+            background: #444;
+            border-bottom: 2px solid #007bff;
           }
         `}</style>
      </div>

@@ -324,10 +324,7 @@ export default function Dashboard() {
   return (
     <div className="ns-root">
       <Navbar
-        variant="dashboard"
         onCreateRoom={() => setOpenRoomModal(true)}
-        onViewPublicRooms={() => alert("Próximamente")}
-        onGoToChat={() => setShowChat(true)}
       />
 
       <main className="dash-main">

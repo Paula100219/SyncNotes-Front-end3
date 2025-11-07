@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import logoPng from "../assets/logo.png";
 import { searchUser } from "../services/Api";
+import { useAuth } from "../hooks/useAuth";
 
 // Helpers MINIMOS y SEGUROS (colócalos arriba del componente, en el mismo archivo):
 
@@ -103,9 +104,9 @@ const Right = styled.div`
 `;
 
 const Button = styled.button`
-  background-color: ${({ variant }) =>
-    variant === "primary" ? "#2388ff" : "transparent"};
-  color: ${({ variant }) => (variant === "primary" ? "#fff" : "#c9d1d9")};
+  background-color: ${({ $variant }) =>
+    $variant === "primary" ? "#2388ff" : "transparent"};
+  color: ${({ $variant }) => ($variant === "primary" ? "#fff" : "#c9d1d9")};
   border: none;
   padding: 0.45rem 1rem;
   border-radius: 0.6rem;
@@ -117,8 +118,8 @@ const Button = styled.button`
   transition: background 0.2s ease, transform 0.1s ease;
 
   &:hover {
-    background-color: ${({ variant }) =>
-      variant === "primary" ? "#1f6feb" : "rgba(255,255,255,0.1)"};
+    background-color: ${({ $variant }) =>
+      $variant === "primary" ? "#1f6feb" : "rgba(255,255,255,0.1)"};
     transform: translateY(-1px);
   }
 `;
@@ -259,12 +260,10 @@ const ModalContent = styled.div`
 `;
 
 export default function Navbar({
-  variant = "login",
   onCreateRoom,
-  onViewPublicRooms,
-  onGoToChat,
   toggleUserMenu,
 }) {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -403,7 +402,7 @@ export default function Navbar({
     }
   };
 
-  if (variant === "dashboard") {
+  if (user) {
     return (
       <>
         <Nav>
@@ -413,14 +412,9 @@ export default function Navbar({
         </Left>
 
         <Right ref={menuRef}>
-          <Button variant="primary" onClick={onCreateRoom}>
+          <Button $variant="primary" onClick={onCreateRoom}>
             + Crear nueva sala
           </Button>
-
-           <Button onClick={onGoToChat}>💬 Ir al chat</Button>
-
-          <Button onClick={onViewPublicRooms}>Ver salas públicas</Button>
-          <IconButton title="Notificaciones">🔔</IconButton>
 
             {/* 🔹 Avatar con menú desplegable */}
             <div style={{ position: "relative" }}>
@@ -557,10 +551,10 @@ export default function Navbar({
       </Left>
       <Right>
         <Link to="/register">
-          <Button variant="secondary">Registrarse</Button>
+          <Button $variant="secondary">Registrarse</Button>
         </Link>
         <Link to="/login">
-          <Button variant="primary">Iniciar sesión</Button>
+          <Button $variant="primary">Iniciar sesión</Button>
         </Link>
       </Right>
     </Nav>

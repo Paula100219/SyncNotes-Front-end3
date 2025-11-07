@@ -709,11 +709,9 @@
 }
 
 .badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.8em;
-  font-weight: 600;
-  text-transform: uppercase;
+  padding: .08rem .5rem;
+  border-radius: 999px;
+  font-size: .75rem;
 }
 
 .badge-owner {
@@ -735,6 +733,12 @@
   background: #10b981;
   color: #fff;
 }
+
+.badge-success { background:rgba(34,197,94,.22); }
+.badge-info    { background:rgba(59,130,246,.22); }
+.badge-danger  { background:rgba(239,68,68,.22); }
+.badge-warning { background:rgba(234,179,8,.22); }
+.badge-neutral { background:rgba(148,163,184,.22); }
 
 /* === MODAL TASK DETAIL === */
 .modal-backdrop {
@@ -864,4 +868,182 @@
 .chat-input button:disabled {
   background: #6b7280;
   cursor: not-allowed;
+}
+
+/* Skeleton for history loading */
+.skeleton-row {
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06));
+  margin: .35rem 0;
+  animation: histPulse 1.2s infinite;
+}
+
+@keyframes histPulse {
+  0% { opacity: .7 }
+  50% { opacity: 1 }
+  100% { opacity: .7 }
+}
+
+/* Tabs for chat/history */
+.tabs-right {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: #a8b3c7;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  color: #e6eaf2;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  color: #1677ff;
+  border-bottom-color: #1677ff;
+}
+
+/* Panel header */
+.panel-header {
+  padding: 16px 20px;
+  background: rgba(24, 28, 46, 0.9);
+  border-bottom: 1px solid #2d3354;
+}
+
+.with-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* History panel styles */
+.panel-body {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.history-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-group {
+  margin-bottom: 16px;
+}
+
+.history-date {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a8b3c7;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1677ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.history-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.user {
+  font-weight: 600;
+  color: #e6eaf2;
+  font-size: 14px;
+}
+
+.badge {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-success {
+  background: #10b981;
+  color: #fff;
+}
+
+.badge-info {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.badge-danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.badge-warning {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.badge-neutral {
+  background: #6b7280;
+  color: #fff;
+}
+
+.time {
+  color: #a8b3c7;
+  font-size: 12px;
+}
+
+.history-details {
+  color: #a8b3c7;
+  font-size: 13px;
+  line-height: 1.4;
 }

@@ -2,3 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+.history-body { max-height:520px; overflow:auto; }
+
+.history-group { margin-bottom: 1rem; }
+
+.history-date { font-weight:600; opacity:.9; margin:.25rem 0 .5rem; }
+
+.history-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+
+.history-item { display:flex; gap:.75rem; }
+
+.avatar { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:700; background:rgba(255,255,255,.10); }
+
+.history-content { flex:1; }
+
+.history-line { display:flex; align-items:center; gap:.5rem; }
+
+.time { margin-left:auto; opacity:.8; font-size:.9rem; }
+
+.history-details { opacity:.95; }
+

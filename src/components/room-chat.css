@@ -162,3 +162,12 @@
  }
 
 .rc-btn:disabled { opacity:.55; cursor:not-allowed; }
+
+/* Tabs */
+.with-tabs { display:flex; align-items:center; justify-content:flex-end; gap:.5rem; }
+
+.tab-btn { padding:.28rem .7rem; border-radius:999px; background:rgba(255,255,255,.08); color:#fff; border:none; transition:transform .1s ease, background .2s ease; }
+
+.tab-btn:hover { transform: translateY(-1px); background:rgba(255,255,255,.12); }
+
+.tab-btn.active { background:linear-gradient(90deg, rgba(59,130,246,.4), rgba(99,102,241,.4)); }

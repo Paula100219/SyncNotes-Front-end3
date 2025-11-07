@@ -207,7 +207,7 @@ export default function ChatBox({ roomId, onClose }) {
                 display: 'grid',
               }}
             >
-        {messages.length === 0 ?
+        {messages.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#9CA3AF', marginTop: 32 }}>
             <div
               style={{
@@ -223,71 +223,69 @@ export default function ChatBox({ roomId, onClose }) {
               ¡Rompe el hielo y saluda al equipo!
             </div>
           </div>
-        :
-            (messages.map((msg, index) => {
+        ) : (
+          <div>
+            {messages.map((msg, index) => {
               const isOwnMessage = msg.isOwnMessage;
-              return <div
-                key={index}
-                className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-2`}
-              >
+              return (
                 <div
-                  className={`max-w-xs px-3 py-2 rounded-2xl shadow-md ${
-                    isOwnMessage
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-gray-700 text-white rounded-bl-none"
-                  }`}
+                  key={index}
+                  className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-2`}
                 >
-                  <p className="text-sm">{msg.content}</p>
-                  <p className="text-xs opacity-70 text-right">{msg.username}</p>
+                  <div
+                    className={`max-w-xs px-3 py-2 rounded-2xl shadow-md ${
+                      isOwnMessage
+                        ? "bg-blue-600 text-white rounded-br-none"
+                        : "bg-gray-700 text-white rounded-bl-none"
+                    }`}
+                  >
+                    <p className="text-sm">{msg.content}</p>
+                    <p className="text-xs opacity-70 text-right">{msg.username}</p>
+                  </div>
                 </div>
-              </div>
-             }))
-
-        }
-
-        </div>
-            <form onSubmit={send} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-             <input
-               value={text}
-               onChange={(e) => setText(e.target.value)}
-               placeholder="Escribe un mensaje..."
-               style={{
-                 flex: 1,
-                 background: '#111827',
-                 color: '#E5E7EB',
-                 border: '1px solid #374151',
-                 borderRadius: 12,
-                 padding: '10px 12px',
-                 outline: 'none',
-               }}
-               disabled={!connected}
-             />
-             <button
-               type="submit"
-               title="Enviar"
-               style={{
-                 width: 44,
-                 height: 44,
-                 borderRadius: 10,
-                 border: 'none',
-                 background: '#2563EB',
-                 color: 'white',
-                 cursor: 'pointer',
-                 display: 'grid',
-                 placeItems: 'center',
-                 fontSize: 18,
-               }}
-             >
-              ✈️
-            </button>
-             </form>
-           </div>
-         </div>
-             </div>
-
-         </div>
-
-         )}
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <form onSubmit={send} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Escribe un mensaje..."
+          style={{
+            flex: 1,
+            background: '#111827',
+            color: '#E5E7EB',
+            border: '1px solid #374151',
+            borderRadius: 12,
+            padding: '10px 12px',
+            outline: 'none',
+          }}
+          disabled={!connected}
+        />
+        <button
+          type="submit"
+          title="Enviar"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 10,
+            border: 'none',
+            background: '#2563EB',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: 18,
+          }}
+        >
+          ✈️
+        </button>
+      </form>
+    </div>
+  </aside>
+);
 
          <form onSubmit={send} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
            <input
