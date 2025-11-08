@@ -120,15 +120,17 @@ export default function RoomDetail(): JSX.Element {
   const [openDeleteTaskModal, setOpenDeleteTaskModal] = useState<boolean>(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [openTaskModal, setOpenTaskModal] = useState<boolean>(false);
-  const [taskForm, setTaskForm] = useState<{ title: string; description: string }>({
-    title: "",
-    description: "",
-  });
-  const [taskError, setTaskError] = useState<string>("");
-  const [taskLoading, setTaskLoading] = useState<boolean>(false);
-      const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-      const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
-      const [taskSelected, setTaskSelected] = useState<Task | null>(null);
+   const [taskForm, setTaskForm] = useState<{ title: string; description: string }>({
+     title: "",
+     description: "",
+   });
+   const [taskError, setTaskError] = useState<string>("");
+   const [taskLoading, setTaskLoading] = useState<boolean>(false);
+       const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+       const [showTaskModal, setShowTaskModal] = useState<boolean>(false);
+       const [taskSelected, setTaskSelected] = useState<Task | null>(null);
+       const [isEditing, setIsEditing] = useState<boolean>(false);
+       const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
   const [rightTab, setRightTab] = useState<'chat' | 'history'>('chat');
 
@@ -200,12 +202,22 @@ useEffect(() => {
     setOpenAddMemberModal(true);
   };
 
-  // Abrir modal crear tarea
-  const handleOpenTaskModal = () => {
-    setTaskForm({ title: "", description: "" });
-    setTaskError("");
-    setOpenTaskModal(true);
-  };
+   // Abrir modal crear tarea
+   const handleOpenTaskModal = () => {
+     setTaskForm({ title: "", description: "" });
+     setTaskError("");
+     setIsEditing(false);
+     setSelectedTaskId("");
+     setOpenTaskModal(true);
+   };
+
+   // Abrir modal editar tarea
+   const handleEditTask = (task: Task) => {
+     setIsEditing(true);
+     setSelectedTaskId(task.id);
+     setTaskForm({ title: task.title, description: task.description || "" });
+     setOpenTaskModal(true);
+   };
 
   // Buscar usuario
   const handleBuscar = async () => {
@@ -317,37 +329,47 @@ useEffect(() => {
      setTaskForm((f) => ({ ...f, [name]: value }));
    };
 
-   const submitTask = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!taskForm.title.trim()) {
-      setTaskError("El título es obligatorio");
-      return;
-    }
-    setTaskError("");
-    setTaskLoading(true);
-    try {
-      const payload = {
-        title: taskForm.title,
-        description: taskForm.description || "",
-      };
-       const newTask = await createTask(roomId!, payload);
-      setTasks((prev) => [newTask, ...prev]);
-      setOpenTaskModal(false);
-      setTaskForm({ title: "", description: "" });
-     } catch (err) {
-       if (err.status === 401 || err.status === 403) {
-         const deletedU = localStorage.getItem("username");
-         if (deletedU) localStorage.setItem("__lastDeletedUsername", deletedU);
-         localStorage.removeItem("token");
-         localStorage.removeItem("username");
-         window.location.replace("/login");
-       } else {
-        alert(err.message || "No se pudo crear la tarea");
-      }
-     } finally {
-       setTaskLoading(false);
+    const submitTask = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+     if (!taskForm.title.trim()) {
+       setTaskError("El título es obligatorio");
+       return;
      }
-    };
+     setTaskError("");
+     setTaskLoading(true);
+     try {
+       if (isEditing) {
+         await updateTask(roomId!, selectedTaskId, {
+           title: taskForm.title,
+           description: taskForm.description || "",
+         });
+       } else {
+         const newTask = await createTask(roomId!, {
+           title: taskForm.title,
+           description: taskForm.description || "",
+         });
+         setTasks((prev) => [newTask, ...prev]);
+       }
+       const updatedTasks = await getRoomTasks(roomId!);
+       setTasks(updatedTasks);
+       setOpenTaskModal(false);
+       setTaskForm({ title: "", description: "" });
+       setIsEditing(false);
+       setSelectedTaskId("");
+      } catch (err) {
+        if (err.status === 401 || err.status === 403) {
+          const deletedU = localStorage.getItem("username");
+          if (deletedU) localStorage.setItem("__lastDeletedUsername", deletedU);
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          window.location.replace("/login");
+        } else {
+         alert(err.message || (isEditing ? "No se pudo editar la tarea" : "No se pudo crear la tarea"));
+       }
+      } finally {
+        setTaskLoading(false);
+      }
+     };
 
    if (loading) return <div className="ns-root"><div className="dash-loading">Cargando…</div></div>;
   if (error) return <div className="ns-root"><div className="ns-alert ns-alert--err">{error}</div></div>;
@@ -517,16 +539,24 @@ useEffect(() => {
                                   </svg>
                                 )}
                               </button>
-                              <button
-                                className="icon-btn"
-                                title="Eliminar tarea"
-                                 onClick={() => confirmDeleteTask(t)}
-                                 style={{ color: '#ef4444' }}
-                              >
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
-                                </svg>
-                              </button>
+                               <button
+                                 className="icon-btn"
+                                 title="Eliminar tarea"
+                                  onClick={() => confirmDeleteTask(t)}
+                                  style={{ color: '#ef4444' }}
+                               >
+                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                   <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
+                                 </svg>
+                               </button>
+                               <button
+                                 className="icon-btn"
+                                 title="Editar tarea"
+                                 onClick={() => handleEditTask(t)}
+                                 style={{ color: '#3b82f6' }}
+                               >
+                                 ✏️
+                               </button>
                            </div>
                          )}
                        </li>
@@ -614,7 +644,7 @@ useEffect(() => {
       {openTaskModal && (
         <div className="modal-backdrop">
           <div className="modal">
-            <h2 className="modal-title">Nueva tarea</h2>
+             <h2 className="modal-title">{isEditing ? "Editar tarea" : "Nueva tarea"}</h2>
             <form onSubmit={submitTask} className="modal-form">
               <label>
                 Título:
@@ -642,9 +672,9 @@ useEffect(() => {
               </label>
 
               <div className="modal-actions">
-                <button type="submit" className="btn-primary" disabled={taskLoading}>
-                  {taskLoading ? "Creando..." : "Crear"}
-                </button>
+                 <button type="submit" className="btn-primary" disabled={taskLoading}>
+                   {taskLoading ? (isEditing ? "Guardando..." : "Creando...") : (isEditing ? "Guardar" : "Crear")}
+                 </button>
                 <button
                   type="button"
                   className="btn-secondary"
