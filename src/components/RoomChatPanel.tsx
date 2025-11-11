@@ -1,4 +1,5 @@
 import React from "react";
+import { Send } from "lucide-react";
 import { useRoomChatPanel } from '../hooks/useRoomChatPanel';
 import "./room-chat.css";
 
@@ -91,7 +92,7 @@ export default function RoomChatPanel({ roomId }: { roomId: string }) {
           type="submit"
           disabled={!input?.trim() || !connected}
         >
-          Enviar
+          <Send size={16} />
         </button>
       </form>
     </section>

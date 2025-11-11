@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { Plus } from "lucide-react";
 import logoPng from "../assets/logo.png";
 import { searchUser } from "../services/Api";
 import { useAuth } from "../hooks/useAuth";
@@ -68,13 +69,13 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   background-color: #0d1117;
-  padding: 0.6rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: 60px;
   z-index: 1000;
 `;
 
@@ -85,8 +86,8 @@ const Left = styled.div`
 `;
 
 const LogoImg = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 `;
 
@@ -144,7 +145,7 @@ const Avatar = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1677ff, #0056cc);
+  background: #0d1117;
   color: white;
   display: flex;
   align-items: center;
@@ -408,13 +409,12 @@ export default function Navbar({
         <Nav>
         <Left>
           <LogoImg src={logoPng} alt="logo" />
-          <BrandText>SyncNotes</BrandText>
         </Left>
 
         <Right ref={menuRef}>
-          <Button $variant="primary" onClick={onCreateRoom}>
-            + Crear nueva sala
-          </Button>
+           <Button $variant="primary" onClick={onCreateRoom}>
+             <Plus size={16} /> Crear nueva sala
+           </Button>
 
             {/* 🔹 Avatar con menú desplegable */}
             <div style={{ position: "relative" }}>

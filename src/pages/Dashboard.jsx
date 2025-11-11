@@ -15,6 +15,7 @@ import {
   updateMemberRole,
   searchUser,
 } from "../services/api";
+import { Trash2, CheckCircle, Circle, Plus, X, Users } from "lucide-react";
 
 const isValidMember = (m) => {
   // Acepta objetos con al menos id/username/name.
@@ -398,13 +399,13 @@ export default function Dashboard() {
                                    </select>
                                  </div>
                                  <div className="member-actions">
-                                   <button
-                                     className="btn-ghost"
-                                     onClick={() => handleRemoveMember(m.userId || m.id)}
-                                     disabled={!(me?.id === selectedRoom.ownerId || me?.role === "ADMIN")}
-                                   >
-                                     🗑️
-                                   </button>
+                                    <button
+                                      className="btn-ghost"
+                                      onClick={() => handleRemoveMember(m.userId || m.id)}
+                                      disabled={!(me?.id === selectedRoom.ownerId || me?.role === "ADMIN")}
+                                    >
+                                      <Trash2 size={16} />
+                                    </button>
                                  </div>
                                </li>
                              );
@@ -434,32 +435,22 @@ export default function Dashboard() {
                           </div>
                           {/* Lado derecho: acciones (no deben propagar el click) */}
                           <div className="task-actions" onClick={(e) => e.stopPropagation()}>
-                           <button
-                             className="icon-btn"
-                             title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
-                             onClick={() => handleToggleComplete(t)}
-                             style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
-                           >
-                             {t.completed ? (
-                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                 <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
-                               </svg>
-                             ) : (
-                               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                 <path d="M9 16.17L4.83 12l-1.41-1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
-                               </svg>
-                             )}
-                           </button>
-                           <button
-                             className="icon-btn"
-                             title="Eliminar tarea"
-                              onClick={() => confirmDeleteTask(t)}
-                              style={{ color: '#ef4444' }}
-                           >
-                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                               <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
-                             </svg>
-                           </button>
+                            <button
+                              className="icon-btn"
+                              title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
+                              onClick={() => handleToggleComplete(t)}
+                              style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
+                            >
+                              {t.completed ? <Circle size={18} /> : <CheckCircle size={18} />}
+                            </button>
+                            <button
+                              className="icon-btn"
+                              title="Eliminar tarea"
+                               onClick={() => confirmDeleteTask(t)}
+                               style={{ color: '#ef4444' }}
+                            >
+                              <Trash2 size={18} />
+                            </button>
                         </div>
                         </li>
                       ))}
@@ -491,12 +482,12 @@ export default function Dashboard() {
                <div className="dash-left">
                  <h2 className="dash-section-title">Mis Salas</h2>
                   <div className="rooms-grid">
-                     {rooms.length === 0 ? (
-                      <div className="room-empty">
-                        <div className="room-empty-icon">👥</div>
-                        <div className="room-empty-title">Aún no tienes salas.</div>
-                        <div className="room-empty-sub">
-                          ¡Crea una para empezar a colaborar!
+                      {rooms.length === 0 ? (
+                       <div className="room-empty">
+                         <div className="room-empty-icon"><Users size={48} /></div>
+                         <div className="room-empty-title">Aún no tienes salas.</div>
+                         <div className="room-empty-sub">
+                           ¡Crea una para empezar a colaborar!
                         </div>
                       </div>
                      ) : (

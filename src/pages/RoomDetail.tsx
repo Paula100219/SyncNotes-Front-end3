@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { CheckCircle, Circle, Trash2, Pencil, Plus, ArrowLeft, MessageCircle, History, UserPlus, Brush, Eye, EyeOff } from "lucide-react";
 import Navbar from "../components/Navbar";
 import RoomChatPanel from "../components/RoomChatPanel";
 import HistoryPanel from "../components/HistoryPanel";
@@ -411,13 +412,13 @@ useEffect(() => {
 
        <main className="dash-main">
          <header className="dash-header">
-           <button className="btn-primary" onClick={() => navigate("/dashboard")}>
-             ← Volver a Mis Salas
-           </button>
+            <button className="btn-primary" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft size={16} /> Volver a Mis Salas
+            </button>
            <h1 className="dash-title">Sala: {room.name}</h1>
-           <button className="btn-toggle-chat" onClick={() => setIsChatOpen(!isChatOpen)}>
-             {isChatOpen ? 'Ocultar Chat' : 'Mostrar Chat'}
-           </button>
+            <button className="btn-toggle-chat" onClick={() => setIsChatOpen(!isChatOpen)}>
+              {isChatOpen ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
          </header>
 
          <section className="dash-room-detail">
@@ -439,9 +440,9 @@ useEffect(() => {
                     </p>
                   )}
                   <p><strong>Miembros:</strong> {safeMembers.length}</p>
-                 <button className="btn-primary" onClick={handleOpenAddMember} style={{ marginTop: '10px' }}>
-                   + Añadir Miembro
-                 </button>
+                  <button className="btn-primary" onClick={handleOpenAddMember} style={{ marginTop: '10px' }}>
+                    <UserPlus size={16} /> Añadir Miembro
+                  </button>
                </div>
 
                <div className="members-list">
@@ -480,12 +481,12 @@ useEffect(() => {
                    <p>No hay usuarios en esta sala.</p>
                  ) : (
                    <ul className="active-users-list">
-                     {activeUsers.map((user) => (
-                       <li key={user.id} className="active-user-item">
-                         <span className="active-user-icon">🟢</span>
-                         {user.name || user.username}
-                       </li>
-                     ))}
+                      {activeUsers.map((user) => (
+                        <li key={user.id} className="active-user-item">
+                          <span className="active-user-icon"><Circle size={12} fill="green" color="green" /></span>
+                          {user.name || user.username}
+                        </li>
+                      ))}
                    </ul>
                  )}
                </div>
@@ -497,13 +498,13 @@ useEffect(() => {
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                    <h3 className="panel-title">Tareas</h3>
                    {myRole !== 'VIEWER' && (
-                     <button className="btn-primary" onClick={handleOpenTaskModal}>
-                       + Nueva tarea
-                     </button>
+                      <button className="btn-primary" onClick={handleOpenTaskModal}>
+                        <Plus size={18} /> Nueva tarea
+                      </button>
                    )}
                  </div>
-                {tasks.length === 0 ? (
-                  <div className="tasks-empty">No hay tareas en esta sala</div>
+                 {tasks.length === 0 ? (
+                   <div className="tasks-empty"><Brush size={20} /> No hay tareas en esta sala</div>
                 ) : (
                    <ul className="tasks-list">
                      {tasks.map((t) => (
@@ -513,9 +514,14 @@ useEffect(() => {
                          onClick={() => { setTaskSelected(t); setShowTaskModal(true); }}
                        >
                          {/* Lado izquierdo: punto + título */}
-                         <div className="task-main">
-                           <span className="dot" style={{ background: t.priority === "HIGH" ? "#ef4444" : t.priority === "LOW" ? "#22c55e" : "#f59e0b" }} />
-                           <span className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</span>
+                          <div className="task-main">
+                            <span className="dot" style={{ background: t.priority === "HIGH" ? "#ef4444" : t.priority === "LOW" ? "#22c55e" : "#f59e0b" }} />
+                            {t.completed ? (
+                              <CheckCircle size={18} color="#22c55e" />
+                            ) : (
+                              <Circle size={18} color="#9CA3AF" />
+                            )}
+                            <span className="task-title" style={t.completed ? { textDecoration: "line-through", opacity: 0.6 } : {}}>{t.title}</span>
                            <span className={`badge ${t.priority === "HIGH" ? "badge-danger" : t.priority === "LOW" ? "badge-success" : "badge-warning"}`}>
                              {t.priority}
                            </span>
@@ -523,40 +529,30 @@ useEffect(() => {
                          {/* Lado derecho: acciones (no deben propagar el click) */}
                          {myRole !== 'VIEWER' && (
                            <div className="task-actions" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                className="icon-btn"
-                                title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
-                                onClick={() => handleToggleComplete(t)}
-                                style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
-                              >
-                                {t.completed ? (
-                                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59 5.58L20 12l-8-8-8 8z" fill="currentColor"/>
-                                  </svg>
-                                ) : (
-                                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
-                                  </svg>
-                                )}
-                              </button>
                                <button
                                  className="icon-btn"
-                                 title="Eliminar tarea"
-                                  onClick={() => confirmDeleteTask(t)}
-                                  style={{ color: '#ef4444' }}
+                                 title={t.completed ? "Marcar como pendiente" : "Marcar como completada"}
+                                 onClick={() => handleToggleComplete(t)}
+                                 style={{ color: t.completed ? '#6b7280' : '#22c55e' }}
                                >
-                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                   <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" fill="currentColor"/>
-                                 </svg>
+                                 {t.completed ? <Circle size={18} /> : <CheckCircle size={18} />}
                                </button>
-                               <button
-                                 className="icon-btn"
-                                 title="Editar tarea"
-                                 onClick={() => handleEditTask(t)}
-                                 style={{ color: '#3b82f6' }}
-                               >
-                                 ✏️
-                               </button>
+                                <button
+                                  className="icon-btn"
+                                  title="Eliminar tarea"
+                                   onClick={() => confirmDeleteTask(t)}
+                                   style={{ color: '#ef4444' }}
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                                <button
+                                  className="icon-btn"
+                                  title="Editar tarea"
+                                  onClick={() => handleEditTask(t)}
+                                  style={{ color: '#3b82f6' }}
+                                >
+                                  <Pencil size={18} />
+                                </button>
                            </div>
                          )}
                        </li>
@@ -570,12 +566,16 @@ useEffect(() => {
               <div className="chat-column">
                 {isChatOpen ? (
                   <>
-                    <div className="panel-header with-tabs">
-                      <div className="tabs-right">
-                        <button className={`tab-btn ${rightTab === "chat" ? "active" : ""}`} onClick={() => setRightTab("chat")}>Chat</button>
-                        <button className={`tab-btn ${rightTab === "history" ? "active" : ""}`} onClick={() => setRightTab("history")}>Historial</button>
-                      </div>
-                    </div>
+                     <div className="panel-header with-tabs">
+                       <div className="tabs-right">
+                         <button className={`tab-btn ${rightTab === "chat" ? "active" : ""}`} onClick={() => setRightTab("chat")}>
+                           <MessageCircle size={16} /> Chat
+                         </button>
+                         <button className={`tab-btn ${rightTab === "history" ? "active" : ""}`} onClick={() => setRightTab("history")}>
+                           <History size={16} /> Historial
+                         </button>
+                       </div>
+                     </div>
                     <div className="panel-content">
                       {rightTab === 'chat' ? (
                         <RoomChatPanel

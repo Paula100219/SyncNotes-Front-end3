@@ -25,7 +25,7 @@ transform: translateY(0);
 
 const PerfilContainer = styled.div`
 
-margin-top: 100px;
+margin-top: 104px;
 
 padding: 2rem;
 

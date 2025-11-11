@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Users, Trash2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { getMe, getMyRooms, deleteRoom, createRoom } from "../services/api";
 import "./dashboard.css";
@@ -104,14 +105,14 @@ export default function RoomsList() {
             <div className="dash-left">
               <h2 className="dash-section-title">Mis Salas</h2>
               <div className="rooms-grid">
-                {rooms.length === 0 ? (
-                  <div className="room-empty">
-                    <div className="room-empty-icon">👥</div>
-                    <div className="room-empty-title">Aún no tienes salas.</div>
-                    <div className="room-empty-sub">
-                      ¡Crea una para empezar a colaborar!
-                    </div>
-                  </div>
+                 {rooms.length === 0 ? (
+                   <div className="room-empty">
+                     <div className="room-empty-icon"><Users size={48} /></div>
+                     <div className="room-empty-title">Aún no tienes salas.</div>
+                     <div className="room-empty-sub">
+                       ¡Crea una para empezar a colaborar!
+                     </div>
+                   </div>
                 ) : (
                   rooms.map((r) => (
                     <div key={r.id} className="room-card">
@@ -126,12 +127,12 @@ export default function RoomsList() {
                         >
                           Abrir sala
                         </button>
-                        <button
-                          className="btn-ghost"
-                          onClick={() => confirmDeleteRoom(r)}
-                        >
-                          🗑️ Eliminar
-                        </button>
+                         <button
+                           className="btn-ghost"
+                           onClick={() => confirmDeleteRoom(r)}
+                         >
+                           <Trash2 size={16} /> Eliminar
+                         </button>
                       </div>
                     </div>
                   ))

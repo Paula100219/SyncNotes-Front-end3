@@ -1,5 +1,5 @@
 .dash-main{
-  min-height:calc(100dvh - 64px);
+  min-height:calc(100dvh - 60px);
   padding: 96px 0 24px;
   background:
     radial-gradient(1200px 600px at 70% 20%, rgba(47,128,237,.16), transparent 60%),
@@ -62,10 +62,7 @@
   background: rgba(16, 185, 129, 0.25);
 }
 
-.btn-toggle-chat::before {
-  content: '💬';
-  font-size: 1rem;
-}
+
 
 /* Botón añadir miembro */
 .btn-add-member{
@@ -919,8 +916,8 @@ html, body {
 }
 
 .tab-btn.active {
-  color: #1677ff;
-  border-bottom-color: #1677ff;
+  color: #e6eaf2;
+  border-bottom-color: #e6eaf2;
 }
 
 /* Panel header */
