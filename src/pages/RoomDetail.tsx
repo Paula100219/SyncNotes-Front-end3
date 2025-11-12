@@ -566,16 +566,20 @@ useEffect(() => {
               <div className="chat-column">
                 {isChatOpen ? (
                   <>
-                     <div className="panel-header with-tabs">
-                       <div className="tabs-right">
-                         <button className={`tab-btn ${rightTab === "chat" ? "active" : ""}`} onClick={() => setRightTab("chat")}>
-                           <MessageCircle size={16} /> Chat
-                         </button>
-                         <button className={`tab-btn ${rightTab === "history" ? "active" : ""}`} onClick={() => setRightTab("history")}>
-                           <History size={16} /> Historial
-                         </button>
-                       </div>
-                     </div>
+                      <div className="flex justify-center gap-3 mb-3">
+                        <button
+                          onClick={() => setRightTab('chat')}
+                          className={rightTab === 'chat' ? 'btn-primary' : 'btn-tab-inactive'}
+                        >
+                          <MessageCircle size={16} /> Chat
+                        </button>
+                        <button
+                          onClick={() => setRightTab('history')}
+                          className={rightTab === 'history' ? 'btn-primary' : 'btn-tab-inactive'}
+                        >
+                          <History size={16} /> Historial
+                        </button>
+                      </div>
                     <div className="panel-content">
                       {rightTab === 'chat' ? (
                         <RoomChatPanel

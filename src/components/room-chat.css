@@ -59,17 +59,21 @@
 }
 
 .rc-messages::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
+}
+
+.rc-messages::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .rc-messages::-webkit-scrollbar-thumb {
-  background: rgba(22, 119, 255, 0.6);
-  border-radius: 8px;
+  background: rgba(107, 114, 128, 0.2);
+  border-radius: 4px;
   transition: background 0.3s ease;
 }
 
 .rc-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(22, 119, 255, 0.8);
+  background: rgba(107, 114, 128, 0.4);
 }
 
 .rc-empty {
@@ -156,36 +160,36 @@
 }
 
 .rc-inputbar {
- flex: 0 0 auto;
- display: grid;
- grid-template-columns: 1fr 44px;
- gap: 8px;
- padding-top: 10px;
- border-top: 1px solid rgba(255,255,255,.08);
- background: linear-gradient(to top, rgba(0,0,0,.25), transparent);
- }
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(to top, rgba(0,0,0,.25), transparent);
+  }
 
 .rc-input {
- height: 42px;
- border-radius: 12px;
- border: 1px solid rgba(255,255,255,.12);
- background: rgba(255,255,255,.06);
- color: #e5e7eb;
- padding: 10px 12px;
- outline: none;
- }
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  color: #e5e7eb;
+  padding: 10px 12px;
+  outline: none;
+  }
 
 .rc-input::placeholder { color:#9aa3b2; }
 
 .rc-btn {
- height: 42px;
- border: none;
- border-radius: 12px;
- background: #0b5ed7;
- color:#fff;
- font-weight: 700;
- cursor: pointer;
- }
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #0b5ed7;
+  color:#fff;
+  font-weight: 700;
+  cursor: pointer;
+  }
 
 .rc-btn:disabled { opacity:.55; cursor:not-allowed; }
 
