@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Plus } from "lucide-react";
+import { Plus, User, LogOut } from "lucide-react";
 import logoPng from "../assets/logo.png";
 import { searchUser } from "../services/Api";
 import { useAuth } from "../hooks/useAuth";
@@ -427,8 +427,8 @@ export default function Navbar({
               </AvatarTrigger>
                {menuOpen && (
                 <Dropdown>
-                  <DropItem className="dropdown-item" onClick={() => { setMenuOpen(false); setShowProfileModal(true); }}>Perfil</DropItem>
-                  <DropItem className="dropdown-item" onClick={handleLogout}>Cerrar sesión</DropItem>
+                   <DropItem className="dropdown-item" onClick={() => { setMenuOpen(false); setShowProfileModal(true); }}><User size={16} /> Perfil</DropItem>
+                   <DropItem className="dropdown-item" onClick={handleLogout}><LogOut size={16} /> Cerrar sesión</DropItem>
                 </Dropdown>
               )}
            </div>

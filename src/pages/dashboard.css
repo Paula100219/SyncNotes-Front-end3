@@ -20,10 +20,16 @@
 }
 .dash-title{
   font-size:32px;
-  font-weight:800;
+  font-weight:900;
   margin:0;
   text-align: center;
   flex: 1;
+  background: linear-gradient(90deg, #e6eaf2, #1677ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
 }
 .dash-actions{ display:flex; gap:10px; }
 
@@ -438,23 +444,24 @@ html, body {
   width: 100%;
   height: 100%;
   background: rgba(10, 15, 25, 0.8);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .modal {
-  background: rgba(17, 24, 39, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 24px 28px;
+  background: linear-gradient(145deg, rgba(17, 24, 39, 0.98), rgba(11, 15, 25, 0.98));
+  border: 1px solid rgba(22, 119, 255, 0.2);
+  border-radius: 20px;
+  padding: 28px 32px;
   width: 100%;
   max-width: 500px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
-  animation: fadeInUp 0.25s ease-out;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(22, 119, 255, 0.1);
+  animation: fadeInUp 0.3s ease-out;
+  backdrop-filter: blur(10px);
 }
 
 .modal h2 {
@@ -476,20 +483,24 @@ html, body {
 .modal input,
 .modal textarea {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   color: #e6eaf2;
-  font-size: 0.9rem;
-  margin-bottom: 14px;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .modal input:focus,
 .modal textarea:focus {
-  border-color: rgba(22, 119, 255, 0.6);
+  border-color: rgba(22, 119, 255, 0.8);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 0 8px rgba(22, 119, 255, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .modal textarea {
@@ -614,18 +625,19 @@ html, body {
 
 /* === ROOM INFO === */
 .room-info {
-  padding: 20px;
-  background: rgba(24, 28, 46, 0.9);
-  border: 1px solid #2d3354;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 24px;
+  background: linear-gradient(145deg, rgba(24, 28, 46, 0.95), rgba(17, 24, 39, 0.95));
+  border: 1px solid rgba(22, 119, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(22, 119, 255, 0.1);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
 }
 
 .room-info:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(22, 119, 255, 0.2);
+  border-color: rgba(22, 119, 255, 0.4);
 }
 
 .room-info h3 {
@@ -652,18 +664,19 @@ html, body {
 }
 
 .members-list {
-  padding: 20px;
-  background: rgba(24, 28, 46, 0.9);
-  border: 1px solid #2d3354;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 24px;
+  background: linear-gradient(145deg, rgba(24, 28, 46, 0.95), rgba(17, 24, 39, 0.95));
+  border: 1px solid rgba(22, 119, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(22, 119, 255, 0.1);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
 }
 
 .members-list:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(22, 119, 255, 0.2);
+  border-color: rgba(22, 119, 255, 0.4);
 }
 
 .members-list h3 {
