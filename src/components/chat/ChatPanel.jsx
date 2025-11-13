@@ -4,6 +4,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useRoomChat } from '../../hooks/useRoomChat';
+import { Send } from 'lucide-react';
 
 // Helpers seguros
 const safeToLower = (str) => str?.toLowerCase() || '';
@@ -33,17 +34,19 @@ return (
 
 <div className="room-chat">
 
-<div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+ <div className="rc-head">
 
-<div style={{ color: '#cbd5e1', fontWeight: 600 }}>Chat de la sala</div>
+ <div style={{ color: '#cbd5e1', fontWeight: 600 }}>Chat de la sala</div>
 
-  <div style={{ color: '#a3a3a3', fontSize: 12 }}>
+ <div className={`rc-dot ${connected ? '' : 'off'}`}></div>
 
-  {connected ? 'Conectado' : 'Conectando...'}
+ <div style={{ color: '#a3a3a3', fontSize: 12 }}>
 
-  </div>
+   {connected ? 'Conectado' : 'Conectando...'}
 
-</div>
+ </div>
+
+ </div>
 
 <div
 
@@ -53,111 +56,107 @@ className="rc-messages"
 
 >
 
-{messages.map((m) => {
+ {messages.map((m) => {
 
- const mine = safeToLower(m?.username) === safeToLower(currentUsername);
+  const mine = safeToLower(m?.username) === safeToLower(currentUsername);
 
-return (
+ return (
 
-<div key={m.id} style={{
+ <div key={m.id} className={`rc-item ${mine ? 'me' : ''}`}>
 
-alignSelf: mine ? 'flex-end' : 'flex-start',
+ {!mine && (
 
-maxWidth: '70%',
+ <div className="rc-avatar">
 
-background: mine ? '#3b82f6' : 'rgba(255,255,255,0.06)',
+ {m.username?.charAt(0).toUpperCase()}
 
-color: mine ? 'white' : '#e5e7eb',
+ </div>
 
-padding: '8px 12px',
+ )}
 
-borderRadius: 12,
+ {mine && (
 
-fontSize: 14
+ <div className="rc-bubble">
 
-}}>
+ <div>{m.content}</div>
 
-{!mine && (
+ <div className="rc-meta">
 
-<div style={{ fontSize: 11, opacity: 0.8, marginBottom: 2 }}>
+ <span className="rc-name">{m.username}</span>
 
-{m.username}
+ <span>{new Date(m.timestamp || Date.now()).toLocaleTimeString()}</span>
+
+ </div>
+
+ </div>
+
+ )}
+
+ {!mine && (
+
+ <div className="rc-bubble">
+
+ <div className="rc-meta">
+
+ <span className="rc-name">{m.username}</span>
+
+ <span>{new Date(m.timestamp || Date.now()).toLocaleTimeString()}</span>
+
+ </div>
+
+ <div>{m.content}</div>
+
+ </div>
+
+ )}
+
+ {mine && (
+
+ <div className="rc-avatar">
+
+ {m.username?.charAt(0).toUpperCase()}
+
+ </div>
+
+ )}
+
+ </div>
+
+ );
+
+ })}
 
 </div>
 
-)}
+ <form onSubmit={handleSend} className="rc-inputbar">
 
-<div>{m.content}</div>
+ <input
 
-</div>
+ className="rc-input"
 
-);
+ value={text}
 
-})}
+ onChange={(e) => setText(e.target.value)}
 
-</div>
+ placeholder="Escribe un mensaje"
 
-<form onSubmit={handleSend} style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-
-<input
-
-value={text}
-
-onChange={(e) => setText(e.target.value)}
-
-placeholder="Escribe un mensaje"
-
-style={{
-
-flex: 1,
-
-background: 'rgba(0,0,0,0.25)',
-
-border: '1px solid rgba(255,255,255,0.06)',
-
-color: '#e5e7eb',
-
-borderRadius: 10,
-
-padding: '10px 12px',
-
-outline: 'none'
-
-}}
-
-/>
+ />
 
  <button
+
+ className="rc-btn"
 
  type="submit"
 
  disabled={!connected}
 
- style={{
-
- background: '#3b82f6',
-
- color: 'white',
-
- border: 'none',
-
- borderRadius: 10,
-
- padding: '0 14px',
-
- cursor: connected ? 'pointer' : 'not-allowed',
-
- opacity: connected ? 1 : 0.6
-
- }}
-
  >
 
-Enviar
+ <Send size={16} />
 
-</button>
+ </button>
 
-</form>
+ </form>
 
 </div>
 

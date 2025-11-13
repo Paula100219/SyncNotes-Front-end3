@@ -69,13 +69,13 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   background-color: #0d1117;
-  padding: 0.5rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 80px;
   z-index: 1000;
 `;
 
@@ -86,8 +86,8 @@ const Left = styled.div`
 `;
 
 const LogoImg = styled.img`
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
 `;
 
@@ -192,7 +192,8 @@ const AvatarInitials = styled.div`
 // 🔹 Estilos del menú desplegable
 const Dropdown = styled.ul`
   position: absolute;
-  top: 56px;
+  top: 100%;
+  margin-top: 4px;
   right: 0;
   background: linear-gradient(145deg, rgba(17, 24, 39, 0.98), rgba(11, 15, 25, 0.98));
   backdrop-filter: blur(12px);
@@ -607,7 +608,7 @@ export default function Navbar({
     <Nav>
       <Left>
         <LogoImg src={logoPng} alt="logo" />
-        <BrandText style={{ color: "#1677ff" }}>SyncNotes</BrandText>
+       
       </Left>
       <Right>
         <Link to="/register">
