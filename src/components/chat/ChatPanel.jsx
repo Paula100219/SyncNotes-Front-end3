@@ -68,7 +68,7 @@ className="rc-messages"
 
  <div className="rc-avatar">
 
- {m.username?.charAt(0).toUpperCase()}
+ {(m.username?.charAt(0)?.toUpperCase() || 'U') === '?' ? 'U' : (m.username?.charAt(0)?.toUpperCase() || 'U')}
 
  </div>
 
@@ -84,7 +84,7 @@ className="rc-messages"
 
  <span className="rc-name">{m.username}</span>
 
- <span>{new Date(m.timestamp || Date.now()).toLocaleTimeString()}</span>
+ <span>{!isNaN(new Date(m.timestamp).getTime()) ? new Date(m.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}</span>
 
  </div>
 
@@ -100,7 +100,7 @@ className="rc-messages"
 
  <span className="rc-name">{m.username}</span>
 
- <span>{new Date(m.timestamp || Date.now()).toLocaleTimeString()}</span>
+ <span>{!isNaN(new Date(m.timestamp).getTime()) ? new Date(m.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}</span>
 
  </div>
 
@@ -114,7 +114,7 @@ className="rc-messages"
 
  <div className="rc-avatar">
 
- {m.username?.charAt(0).toUpperCase()}
+ {(m.username?.charAt(0)?.toUpperCase() || 'U') === '?' ? 'U' : (m.username?.charAt(0)?.toUpperCase() || 'U')}
 
  </div>
 
@@ -152,7 +152,7 @@ className="rc-messages"
 
  >
 
- <Send size={16} />
+ Enviar
 
  </button>
 

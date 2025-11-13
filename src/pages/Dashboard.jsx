@@ -330,7 +330,7 @@ export default function Dashboard() {
 
       <main className="dash-main">
         <header className="dash-header">
-          <h1 className="dash-title">Tu Espacio de Trabajo</h1>
+          <h1 className="dash-title">Tu espacio de trabajo</h1>
         </header>
 
         {loading ? (
@@ -472,7 +472,7 @@ export default function Dashboard() {
                     }}
                     style={{ marginTop: '20px', width: 'auto', padding: '10px 16px' }}
                   >
-                    ← Volver a Mis Salas
+                    ← Volver a mis salas
                   </button>
               </aside>
                </section>

@@ -413,7 +413,7 @@ useEffect(() => {
        <main className="dash-main">
          <header className="dash-header">
             <button className="btn-primary" onClick={() => navigate("/dashboard")}>
-              <ArrowLeft size={16} /> Volver a Mis Salas
+              <ArrowLeft size={16} /> Volver a mis salas
             </button>
            <h1 className="dash-title">Sala: {room.name}</h1>
             <button className="btn-toggle-chat" onClick={() => setIsChatOpen(!isChatOpen)}>
@@ -441,7 +441,7 @@ useEffect(() => {
                   )}
                   <p><strong>Miembros:</strong> {safeMembers.length}</p>
                   <button className="btn-primary" onClick={handleOpenAddMember} style={{ marginTop: '10px' }}>
-                    <UserPlus size={16} /> Añadir Miembro
+                    <UserPlus size={16} /> Añadir miembro
                   </button>
                </div>
 
