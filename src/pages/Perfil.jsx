@@ -6,6 +6,8 @@ import Navbar from "../components/Navbar";
 
 import { useNavigate } from "react-router-dom";
 
+import { Edit, Trash2, LogOut } from "lucide-react";
+
 const BASE = "http://localhost:8081";
 
 const getToken = () => localStorage.getItem("token") || "";
@@ -143,45 +145,71 @@ const SectionTitle = styled.h3`
 
 color: #60a5fa;
 
-font-size: 1.1rem;
+font-size: 1.3rem;
 
-margin-bottom: 1rem;
+font-weight: 700;
+
+margin-bottom: 1.5rem;
+
+text-align: center;
 
 `;
 
 const ButtonRow = styled.div`
 
-display: flex;
+display: grid;
 
-flex-wrap: wrap;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 
-gap: 1rem;
+gap: 1.5rem;
 
 `;
 
 const Button = styled.button`
 
-background-color: ${(props) => props.color || "#2563eb"};
+background: linear-gradient(135deg, ${(props) => props.color || "#2563eb"} 0%, ${(props) => props.color || "#2563eb"}dd 100%);
 
 color: white;
 
 border: none;
 
-padding: 0.7rem 1.2rem;
+padding: 0.8rem 1.5rem;
 
-border-radius: 8px;
+border-radius: 12px;
 
 cursor: pointer;
 
 font-weight: 600;
 
-transition: background 0.2s ease;
+transition: all 0.3s ease;
 
 flex: 1;
 
+min-width: 180px;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+gap: 0.5rem;
+
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
 &:hover {
 
-opacity: 0.9;
+transform: translateY(-2px);
+
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+
+opacity: 0.95;
+
+}
+
+&:active {
+
+transform: translateY(0);
 
 }
 
@@ -241,65 +269,81 @@ return (
 
 <PerfilContainer>
 
-<PerfilCard>
+ <PerfilCard>
 
-<Header>
+ <Header>
 
-<Avatar>{user.name?.charAt(0).toUpperCase()}</Avatar>
+ <Avatar>{user.name?.charAt(0).toUpperCase()}</Avatar>
 
-<Info>
+ <Info>
 
-<h2>{user.name}</h2>
+ <h2>{user.name}</h2>
 
-<span>@{user.username}</span>
+ <span>@{user.username}</span>
 
-</Info>
+ </Info>
 
-</Header>
+ </Header>
 
+ <Section>
 
+ <SectionTitle>Acciones de cuenta</SectionTitle>
 
-</PerfilCard>
+ <ButtonRow>
 
-<Section>
+ <Button onClick={() => navigate("/actualizar-usuario")} color="#2563eb">
 
-<SectionTitle>Acciones de cuenta</SectionTitle>
+ <Edit size={18} style={{ marginRight: '8px' }} />
 
-<ButtonRow>
+ Actualizar usuario
 
-<Button onClick={() => navigate("/actualizar-usuario")} color="#2563eb">
+ </Button>
 
-Actualizar usuario
+ <Button onClick={() => {
 
-</Button>
+ if (window.confirm("¿Estás seguro de que quieres eliminar tu usuario? Esta acción no se puede deshacer.")) {
 
-<Button onClick={() => navigate("/eliminar-usuario")} color="#dc2626">
+ navigate("/eliminar-usuario");
 
-Eliminar usuario
+ }
 
-</Button>
+ }} color="#dc2626">
 
-<Button
+ <Trash2 size={18} />
 
-onClick={() => {
+ Eliminar usuario
 
-localStorage.removeItem("token");
+ </Button>
 
-navigate("/login");
+ <Button
 
-}}
+ onClick={() => {
 
-color="#6b7280"
+ if (window.confirm("¿Estás seguro de que quieres cerrar sesión?")) {
 
->
+ localStorage.removeItem("token");
 
-Cerrar sesión
+ navigate("/login");
 
-</Button>
+ }
 
-</ButtonRow>
+ }}
 
-</Section>
+ color="#6b7280"
+
+ >
+
+ <LogOut size={18} />
+
+ Cerrar sesión
+
+ </Button>
+
+ </ButtonRow>
+
+ </Section>
+
+ </PerfilCard>
 
 </PerfilContainer>
 

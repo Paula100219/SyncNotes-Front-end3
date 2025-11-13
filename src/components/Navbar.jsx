@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Plus, User, LogOut } from "lucide-react";
+import { Plus, User, LogOut, Edit, Trash2 } from "lucide-react";
 import logoPng from "../assets/logo.png";
 import { searchUser } from "../services/Api";
 import { useAuth } from "../hooks/useAuth";
@@ -523,17 +523,77 @@ export default function Navbar({
                 @{localStorage.getItem("username") || "username"}
               </p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Button onClick={() => { setShowProfileModal(false); openUpdateUser(); }}>
-                Actualizar usuario
-              </Button>
-              <Button color="#dc2626" onClick={() => { setShowProfileModal(false); setShowDeleteConfirmModal(true); }}>
-                Eliminar usuario
-              </Button>
-              <Button color="#6b7280" onClick={() => { setShowProfileModal(false); handleLogout(); }}>
-                Cerrar sesión
-              </Button>
-            </div>
+             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+               <Button
+                 onClick={() => { setShowProfileModal(false); openUpdateUser(); }}
+                 style={{
+                   background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                   color: 'white',
+                   border: 'none',
+                   padding: '0.8rem 1.5rem',
+                   borderRadius: '12px',
+                   cursor: 'pointer',
+                   fontWeight: '600',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   gap: '0.5rem',
+                   boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+                   transition: 'all 0.3s ease',
+                 }}
+                 onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                 onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+               >
+                 <Edit size={18} />
+                 Actualizar usuario
+               </Button>
+               <Button
+                 onClick={() => { setShowProfileModal(false); setShowDeleteConfirmModal(true); }}
+                 style={{
+                   background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                   color: 'white',
+                   border: 'none',
+                   padding: '0.8rem 1.5rem',
+                   borderRadius: '12px',
+                   cursor: 'pointer',
+                   fontWeight: '600',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   gap: '0.5rem',
+                   boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
+                   transition: 'all 0.3s ease',
+                 }}
+                 onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                 onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+               >
+                 <Trash2 size={18} />
+                 Eliminar usuario
+               </Button>
+               <Button
+                 onClick={() => { setShowProfileModal(false); handleLogout(); }}
+                 style={{
+                   background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                   color: 'white',
+                   border: 'none',
+                   padding: '0.8rem 1.5rem',
+                   borderRadius: '12px',
+                   cursor: 'pointer',
+                   fontWeight: '600',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   gap: '0.5rem',
+                   boxShadow: '0 4px 15px rgba(107, 114, 128, 0.3)',
+                   transition: 'all 0.3s ease',
+                 }}
+                 onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                 onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+               >
+                 <LogOut size={18} />
+                 Cerrar sesión
+               </Button>
+             </div>
           </ModalContent>
         </Modal>
       )}
